@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Romanyck Coiffure | Studio Premium Styliste & Coloriste Mixte</title>
+    <meta name="description" content="Découvrez Romanyck Coiffure, salon de coiffure haut de gamme et studio de création mixte. Expertise sur-mesure en stylisme, visagisme et colorimétrie de prestige.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Montserrat:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Header / Navigation -->
+    <header class="header">
+        <div class="header-container">
+            <a href="#" class="logo">
+                <span class="logo-main">ROMANYCK</span>
+                <span class="logo-sub">COIFFURE</span>
+            </a>
+            
+            <nav class="nav-menu" id="navMenu">
+                <a href="#accueil" class="nav-link active">Accueil</a>
+                <a href="#expertise" class="nav-link">L'Expertise</a>
+                <a href="#galerie" class="nav-link">Le Studio</a>
+                <a href="#tarifs" class="nav-link">Prestations</a>
+                <a href="#contact" class="nav-link">L'Expérience</a>
+            </nav>
+
+            <div class="header-actions">
+                <a href="#contact" class="btn btn-primary btn-sm">Réserver un Diagnostic</a>
+                <button class="mobile-toggle" id="mobileToggle" aria-label="Menu de navigation">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+
+        <!-- SECTION 1 : L'Héro (Accueil) -->
+        <section id="accueil" class="hero-section">
+            <div class="container hero-container">
+                <div class="hero-content">
+                    <div class="tagline">
+                        <span class="gold-line"></span>
+                        <span class="tagline-text">Studio de Création Capillaire Mixte</span>
+                    </div>
+                    <h1 class="hero-title">
+                        L'art de la coupe. <br>
+                        <span class="text-italic italic-accent">La science de la nuance.</span>
+                    </h1>
+                    <p class="hero-description">
+                        Depuis plus de 25 ans, Jérôme Romanyck et son équipe réinventent votre identité visuelle à Lyon. Entre rigueur graphique du stylisme sur-mesure et alchimie colorielle de pointe, vivez une expérience haute couture dédiée aux esthètes exigeants, hommes et femmes.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="#tarifs" class="btn btn-outline">Explorer les Prestations</a>
+                        <a href="#contact" class="btn btn-primary">Prendre Rendez-vous <i class="fa-solid fa-chevron-right"></i></a>
+                    </div>
+                    <div class="hero-details">
+                        <div class="detail-item">
+                            <span class="detail-number">25 ans</span>
+                            <span class="detail-label">d'Expertise Capillaire</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-number">100%</span>
+                            <span class="detail-label">Visagisme Sur-mesure</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-number">Expert</span>
+                            <span class="detail-label">Coloriste Schwarzkopf Pro</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-image-wrapper">
+                    <div class="image-card">
+                        <img src="assets/facade.png" alt="Devanture chic de Jérôme Romanyck Coiffure à Lyon" class="hero-img">
+                        <div class="image-overlay"></div>
+                        <div class="heritage-seal">
+                            <svg viewBox="0 0 100 100" width="115" height="115" aria-label="Sceau 25 ans d'excellence">
+                                <path id="circlePath" d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0" fill="none" />
+                                <text font-size="7.5" font-family="Montserrat" font-weight="500" fill="#c5a880" letter-spacing="0.18em">
+                                    <textPath href="#circlePath">JÉRÔME ROMANYCK • 25 ANS D'EXCELLENCE •</textPath>
+                                </text>
+                                <circle cx="50" cy="50" r="10" fill="#c5a880" />
+                                <text x="50" y="53" font-size="8" font-family="Cormorant Garamond" font-weight="600" fill="#090c0e" text-anchor="middle">25</text>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="scroll-indicator">
+                <span class="mouse">
+                    <span class="wheel"></span>
+                </span>
+                <span class="scroll-text">Faire défiler</span>
+            </div>
+        </section>
+
+        <!-- SECTION 2 : L'Expertise Styliste & Coloriste -->
+        <section id="expertise" class="expertise-section">
+            <div class="container">
+                <div class="section-header text-center">
+                    <span class="section-subtitle">Savoir-Faire Signature</span>
+                    <h2 class="section-title">L'Équilibre Absolu entre Ligne et Couleur</h2>
+                    <p class="section-lead">Nous envisageons la coiffure comme une discipline artistique. Chaque coupe structure le visage, chaque reflet illumine le regard.</p>
+                </div>
+
+                <div class="expertise-grid">
+                    <!-- Expertise 1: Le Stylisme -->
+                    <div class="expertise-card card-stylisme">
+                        <div class="card-content">
+                            <div class="card-icon"><i class="fa-solid fa-compass-drafting"></i></div>
+                            <h3>Le Stylisme Graphique & Morpho-Coiffure</h3>
+                            <p class="card-text">
+                                Une coupe réussie ne suit pas les modes : elle révèle votre architecture naturelle. Par une analyse minutieuse de vos traits, de votre port de tête et de l'implantation de vos cheveux, nous dessinons des coupes sur-mesure, faciles à vivre au quotidien mais à la structure impeccable et intemporelle.
+                            </p>
+                            <ul class="card-list">
+                                <li><i class="fa-solid fa-check"></i> Diagnostic visagisme personnalisé</li>
+                                <li><i class="fa-solid fa-check"></i> Coupes graphiques & structures modernes</li>
+                                <li><i class="fa-solid fa-check"></i> Stylisme masculin (texturisation, coupes ciseaux & tondeuse)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Middle Image Callout -->
+                    <div class="expertise-image-callout">
+                        <div class="callout-inner">
+                            <img src="assets/shampoo.jpg" alt="L'espace détente et shampoing de prestige" class="callout-img">
+                            <div class="callout-overlay"></div>
+                            <div class="callout-content">
+                                <h4>Le Salon-Galerie</h4>
+                                <p>Un lieu hybride où le design se mêle à l'art classique. Notre espace bacs, adossé à un bleu canard profond et orné d'un tableau d'époque, invite à une véritable déconnexion sensorielle.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Expertise 2: La Colorimétrie -->
+                    <div class="expertise-card card-coloriste">
+                        <div class="card-content">
+                            <div class="card-icon"><i class="fa-solid fa-palette"></i></div>
+                            <h3>La Colorimétrie Haute Couture</h3>
+                            <p class="card-text">
+                                Coloristes experts, nous maîtrisons la physique et la chimie des pigments pour créer des nuances d'une brillance absolue. Nous jouons avec la lumière, créons des contrastes subtils pour donner du relief et de la profondeur à votre chevelure sans jamais altérer sa matière.
+                            </p>
+                            <ul class="card-list">
+                                <li><i class="fa-solid fa-check"></i> Balayages signatures & micro-painting</li>
+                                <li><i class="fa-solid fa-check"></i> Ombres subtils & fondus de racines ultra-naturels</li>
+                                <li><i class="fa-solid fa-check"></i> Soins profonds reconstructeurs et fixateurs de pigments</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2.5 : Le Diagnostic Signature en 3 Étapes -->
+        <section class="diagnostic-section">
+            <div class="container">
+                <div class="section-header text-center">
+                    <span class="section-subtitle">L'Art de la Personnalisation</span>
+                    <h2 class="section-title">Le Diagnostic Signature en 3 Temps</h2>
+                    <p class="section-lead">Parce que chaque style est unique, Jérôme Romanyck fonde son expertise sur un protocole d'analyse individuel précis développé depuis 25 ans.</p>
+                </div>
+                
+                <div class="diagnostic-steps">
+                    <!-- Étape 1 -->
+                    <div class="step-card fade-in-up">
+                        <div class="step-number-wrapper">
+                            <span class="step-number">01</span>
+                            <span class="step-line"></span>
+                        </div>
+                        <div class="step-info">
+                            <h4>L'Étude Morphologique & Visagisme</h4>
+                            <p>Nous débutons chaque rendez-vous par un échange approfondi. Forme du visage, grain de peau, couleur des yeux, ligne du cou, mais aussi texture naturelle et implantation capillaire : tout est analysé pour esquisser les bases de votre structure idéale.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Étape 2 -->
+                    <div class="step-card fade-in-up">
+                        <div class="step-number-wrapper">
+                            <span class="step-number">02</span>
+                            <span class="step-line"></span>
+                        </div>
+                        <div class="step-info">
+                            <h4>La Création & L'Accord Chromatique</h4>
+                            <p>C'est l'alchimie du geste. Jérôme Romanyck sculpte la coupe au ciseau avec une rigueur géométrique tandis que l'expert-coloriste élabore un mélange sur-mesure. Nous marions la coupe et la nuance chromatique pour sublimer les contrastes et capter la lumière.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Étape 3 -->
+                    <div class="step-card fade-in-up">
+                        <div class="step-number-wrapper">
+                            <span class="step-number">03</span>
+                        </div>
+                        <div class="step-info">
+                            <h4>La Pérennisation & Rituels Privés</h4>
+                            <p>L'excellence se prolonge à domicile. Nous vous transmettons les conseils professionnels pour entretenir la structure de votre coupe et l'éclat de votre couleur chez vous, accompagnés de soins capillaires de pointe.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- SECTION 2.7 : La Métamorphose Signature (Slider Avant/Après) -->
+        <section id="metamorphose" class="metamorphose-section">
+            <div class="container">
+                <div class="section-header text-center">
+                    <span class="section-subtitle">La Métamorphose Signature</span>
+                    <h2 class="section-title">L'Art du Balayage en Mouvement</h2>
+                    <p class="section-lead">Faites glisser le curseur pour apprécier l'éclat, la profondeur et la texture d'un balayage signature réalisé dans notre studio.</p>
+                </div>
+                
+                <div class="before-after-slider" id="balayageSlider">
+                    <div class="image-container before-image">
+                        <img src="assets/balayage_before.png" alt="Balayage Avant - Romanyck Coiffure">
+                        <span class="image-label label-before">Chevelure Naturelle (Avant)</span>
+                    </div>
+                    <div class="image-container after-image" id="afterImageWrapper">
+                        <img src="assets/balayage_after.png" alt="Balayage Après - Romanyck Coiffure">
+                        <span class="image-label label-after">Balayage Signature (Après)</span>
+                    </div>
+                    <div class="slider-handle" id="sliderHandle">
+                        <div class="handle-line"></div>
+                        <div class="handle-button">
+                            <i class="fa-solid fa-left-right"></i>
+                        </div>
+                        <div class="handle-line"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- SECTION 3 : Le Portfolio / Galerie -->
+        <section id="galerie" class="gallery-section">
+            <div class="container">
+                <div class="gallery-intro-grid">
+                    <div class="gallery-header">
+                        <span class="section-subtitle">Le Regard Artistique</span>
+                        <h2 class="section-title">Notre Studio en Détail</h2>
+                    </div>
+                    <div class="gallery-manifesto">
+                        <blockquote class="manifesto-quote">
+                            "Le minimalisme n'est pas le manque de quelque chose, c'est simplement la quantité parfaite de chaque élément."
+                        </blockquote>
+                        <p class="manifesto-text">
+                            À travers ces instantanés de notre studio, découvrez une atmosphère pensée pour le confort intellectuel et visuel de notre clientèle. Un espace d'expression pure où chaque flacon de soin, chaque miroir et chaque éclat de lumière a été pensé pour faire de votre visite un moment suspendu.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Gallery Category Filters -->
+                <div class="gallery-filters" id="galleryFilters">
+                    <button class="filter-btn active" data-filter="all">Tout le Studio</button>
+                    <button class="filter-btn" data-filter="ambiance">Architecture & Art</button>
+                    <button class="filter-btn" data-filter="soins">Soins & Détente</button>
+                    <button class="filter-btn" data-filter="produits">Rituels Privés</button>
+                    <button class="filter-btn" data-filter="studio">Le Studio de Création</button>
+                </div>
+
+                <!-- Beautiful Asymmetric CSS Grid Gallery -->
+                <div class="gallery-grid">
+                    
+                    <div class="gallery-item item-lg" data-category="ambiance">
+                        <div class="gallery-img-box">
+                            <img src="assets/reception.jpg" alt="L'accueil design avec son lustre de Murano chez Jérôme Romanyck Coiffure" class="gallery-img">
+                            <div class="gallery-img-overlay">
+                                <span class="gallery-cat">Architecture & Art</span>
+                                <h3 class="gallery-item-title">L'Éclat de Murano</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gallery-item item-md" data-category="soins">
+                        <div class="gallery-img-box">
+                            <img src="assets/shampoo.jpg" alt="L'espace de soin et bacs d'exception" class="gallery-img">
+                            <div class="gallery-img-overlay">
+                                <span class="gallery-cat">Détente</span>
+                                <h3 class="gallery-item-title">Le Salon Bacs d'Artiste</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gallery-item item-sm" data-category="produits">
+                        <div class="gallery-img-box">
+                            <img src="assets/products.jpg" alt="Sélection de produits capillaires de luxe sur étagères épurées" class="gallery-img">
+                            <div class="gallery-img-overlay">
+                                <span class="gallery-cat">Rituels</span>
+                                <h3 class="gallery-item-title">Flaconnage & Rituels</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gallery-item item-wd" data-category="studio">
+                        <div class="gallery-img-box">
+                            <img src="assets/styling.jpg" alt="Le studio de coiffure moderne et ses fauteuils design" class="gallery-img">
+                            <div class="gallery-img-overlay">
+                                <span class="gallery-cat">Technique</span>
+                                <h3 class="gallery-item-title">Le Studio de Création</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4 : La Carte des Prestations -->
+        <section id="tarifs" class="pricing-section">
+            <div class="container">
+                <div class="section-header text-center">
+                    <span class="section-subtitle">Menu de Prestige</span>
+                    <h2 class="section-title">Rituels de Stylisme & de Couleur</h2>
+                    <p class="section-lead">Toutes nos prestations débutent par un entretien approfondi avec diagnostic morphologique et analyse de la fibre capillaire.</p>
+                </div>
+
+                <!-- Tabs Navigation -->
+                <div class="pricing-tabs">
+                    <button class="tab-btn active" data-tab="femme">Rituels Femme</button>
+                    <button class="tab-btn" data-tab="homme">Rituels Homme</button>
+                    <button class="tab-btn" data-tab="techniques">Colorations & Techniques</button>
+                </div>
+
+                <!-- Tabs Content -->
+                <div class="pricing-content">
+                    
+                    <!-- Tab 1: Rituels Femme -->
+                    <div class="tab-pane active" id="femme">
+                        <div class="pricing-grid">
+                            <div class="pricing-card">
+                                <div class="price-header">
+                                    <h4>Shampoing Coupe Coiffage</h4>
+                                    <span class="price">40 €</span>
+                                </div>
+                                <p class="price-desc">Diagnostic visagisme personnalisé, shampoing sensoriel, massage relaxant du cuir chevelu, coupe de structure sur-mesure et séchage ou coiffage personnalisé.</p>
+                            </div>
+                            
+                            <div class="pricing-card">
+                                <div class="price-header">
+                                    <h4>Shampoing Coiffage</h4>
+                                    <span class="price">22 €</span>
+                                </div>
+                                <p class="price-desc">Shampoing traitant adapté aux besoins de votre chevelure, soin et brushing signature lisse, souple ou bouclé haute tenue.</p>
+                            </div>
+
+                            <div class="pricing-card">
+                                <div class="price-header">
+                                    <h4>Couleur + Coupe Coiffage</h4>
+                                    <span class="price">59 €</span>
+                                </div>
+                                <p class="price-desc">Rituel coloration sur-mesure Schwarzkopf Professional (sans ammoniaque), avec shampoing, soin protecteur de pigments, coupe et coiffage complet.</p>
+                            </div>
+
+                            <div class="pricing-card">
+                                <div class="price-header">
+                                    <h4>Couleur + Coiffage</h4>
+                                    <span class="price">44 €</span>
+                                </div>
+                                <p class="price-desc">Coloration profonde et lumineuse pour raviver vos nuances, accompagnée d'un shampoing, soin fixateur d'éclat et coiffage brushing.</p>
+                            </div>
+
+                            <div class="pricing-card">
+                                <div class="price-header">
+                                    <h4>Mèches + Coupe Coiffage</h4>
+                                    <span class="price">72 €</span>
+                                </div>
+                                <p class="price-desc">Technique d'éclaircissement sur-mesure (mèches ou balayage), rituel de soin reconstructeur, coupe graphique personnalisée et coiffage.</p>
+                            </div>
+
+                            <div class="pricing-card">
+                                <div class="price-header">
+                                    <h4>Mèches + Coiffage</h4>
+                                    <span class="price">57 €</span>
+                                </div>
+                                <p class="price-desc">Éclaircissement délicat et multi-tons pour apporter du relief, shampoing sensoriel, soin fixateur de reflets et brushing signature.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Rituels Homme -->
+                    <div class="tab-pane" id="homme">
+                        <div class="pricing-grid">
+                            <div class="pricing-card">
+                                <div class="price-header">
+                                    <h4>Shampoing Coupe Coiffage</h4>
+                                    <span class="price">23 €</span>
+                                </div>
+                                <p class="price-desc">Diagnostic morphologique, shampoing clarifiant, massage relaxant du cuir chevelu, coupe précise aux ciseaux ou tondeuse et coiffage texturisé.</p>
+                            </div>
+
+                            <div class="pricing-card">
+                                <div class="price-header">
+                                    <h4>Forfait Étudiant</h4>
+                                    <span class="price">19 €</span>
+                                </div>
+                                <p class="price-desc">Tarif préférentiel incluant shampoing massant, coupe tendance adaptée et coiffage (sur présentation d'un justificatif étudiant).</p>
+                            </div>
+
+                            <div class="pricing-card">
+                                <div class="price-header">
+                                    <h4>Forfait Enfant (- de 10 ans)</h4>
+                                    <span class="price">14 €</span>
+                                </div>
+                                <p class="price-desc">Coupe adaptée et rapide pour les plus jeunes, avec shampoing très doux et séchage ou coiffage naturel.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: Colorations & Techniques -->
+                    <div class="tab-pane" id="techniques">
+                        <div class="pricing-grid">
+                            <div class="pricing-card">
+                                <div class="price-header">
+                                    <h4>Coloration & Pigmentation</h4>
+                                    <span class="price">à partir de 30 €</span>
+                                </div>
+                                <p class="price-desc">Application précise en racine de nos colorations haut de gamme pour une brillance intense et une couverture parfaite.</p>
+                            </div>
+
+                            <div class="pricing-card">
+                                <div class="price-header">
+                                    <h4>Mèches & Balayage Signature</h4>
+                                    <span class="price">à partir de 45 €</span>
+                                </div>
+                                <p class="price-desc">Placement libre et technique de création d'éclat sur-mesure pour apporter du relief et de la luminosité à vos cheveux.</p>
+                            </div>
+
+                            <div class="pricing-card">
+                                <div class="price-header">
+                                    <h4>Gloss, Patine & Soin Éclat</h4>
+                                    <span class="price">à partir de 15 €</span>
+                                </div>
+                                <p class="price-desc">Bain de lumière ton sur ton pour sublimer vos reflets, neutraliser les faux reflets ou patiner un blond.</p>
+                            </div>
+
+                            <div class="pricing-card">
+                                <div class="price-header">
+                                    <h4>Transformation Blondeur & Lissage</h4>
+                                    <span class="price">sur devis</span>
+                                </div>
+                                <p class="price-desc">Changement de ton radical, décoloration globale ou soin lisseur de prestige. Devis gratuit réalisé sur place.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pricing-footer text-center">
+                    <p class="pricing-note">* Les tarifs techniques varient en fonction de l'épaisseur et de la longueur de vos cheveux. Un devis précis vous sera systématiquement proposé avant le début de la prestation.</p>
+                    <a href="#contact" class="btn btn-primary">Réserver une consultation couleur</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4.3 : Le Livre d'Or (Témoignages de Prestige) -->
+        <section class="testimonials-section">
+            <div class="container">
+                <div class="section-header text-center">
+                    <span class="section-subtitle">Le Livre d'Or</span>
+                    <h2 class="section-title">L'Écho du Studio</h2>
+                    <p class="section-lead">Découvrez les retours d'expérience de nos client(e)s, fidèles esthètes du cheveu à Lyon depuis plus de 25 ans.</p>
+                </div>
+
+                <div class="testimonials-slider-wrapper">
+                    <div class="testimonials-slider" id="testimonialsSlider">
+                        <!-- Avis 1 -->
+                        <div class="testimonial-slide active">
+                            <div class="testimonial-card">
+                                <div class="card-quote-icon"><i class="fa-solid fa-quote-left"></i></div>
+                                <div class="rating-stars">
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                </div>
+                                <p class="testimonial-text">
+                                    "Fidèle au salon depuis plus de 15 ans. Jérôme a un sens inné des volumes et de la morphologie. Son diagnostic est un moment de pure écoute, et la coupe finale est toujours une œuvre d'art structurelle, d'une élégance intemporelle."
+                                </p>
+                                <div class="testimonial-meta">
+                                    <span class="client-name">Hélène D.</span>
+                                    <span class="client-city">Lyon 6ème</span>
+                                    <span class="client-service">Rituel Coupe Morpho-Signature</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Avis 2 -->
+                        <div class="testimonial-slide">
+                            <div class="testimonial-card">
+                                <div class="card-quote-icon"><i class="fa-solid fa-quote-left"></i></div>
+                                <div class="rating-stars">
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                </div>
+                                <p class="testimonial-text">
+                                    "Le meilleur studio de coiffure de Lyon. L'espace détente des bacs est un véritable havre de paix, adossé à ce mur bleu canard magistral. La coupe homme est sculptée aux ciseaux avec une précision et un soin maniaque."
+                                </p>
+                                <div class="testimonial-meta">
+                                    <span class="client-name">Marc-Antoine V.</span>
+                                    <span class="client-city">Quartier Saxe</span>
+                                    <span class="client-service">Coupe Studio Homme</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Avis 3 -->
+                        <div class="testimonial-slide">
+                            <div class="testimonial-card">
+                                <div class="card-quote-icon"><i class="fa-solid fa-quote-left"></i></div>
+                                <div class="rating-stars">
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                    <i class="fa-solid fa-star"></i>
+                                </div>
+                                <p class="testimonial-text">
+                                    "Des coloristes d'exception. J'ai confié mes cheveux pour un balayage signature et le résultat est d'une brillance tridimensionnelle incroyable. La couleur capte magnifiquement la lumière tout en respectant la matière."
+                                </p>
+                                <div class="testimonial-meta">
+                                    <span class="client-name">Clarisse B.</span>
+                                    <span class="client-city">Monts d'Or</span>
+                                    <span class="client-service">Balayage Signature & Contouring</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Slider Navigation -->
+                    <div class="slider-controls">
+                        <button class="slider-arrow prev-arrow" id="prevSlide" aria-label="Avis précédent"><i class="fa-solid fa-chevron-left"></i></button>
+                        <div class="slider-dots" id="sliderDots">
+                            <span class="dot active" data-index="0"></span>
+                            <span class="dot" data-index="1"></span>
+                            <span class="dot" data-index="2"></span>
+                        </div>
+                        <button class="slider-arrow next-arrow" id="nextSlide" aria-label="Avis suivant"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4.7 : Les Maisons Partenaires -->
+        <section class="partners-section">
+            <div class="container">
+                <div class="partners-inner">
+                    <p class="partners-title">Nos Rituels s'appuient sur l'Excellence des Grandes Maisons</p>
+                    <div class="partners-logos">
+                        <div class="partner-logo animate-glow">
+                            <span class="logo-text">SCHWARZKOPF</span>
+                            <span class="logo-subtext">PROFESSIONAL</span>
+                        </div>
+                        <div class="partner-logo animate-glow">
+                            <span class="logo-text">KÉRASTASE</span>
+                            <span class="logo-subtext">PARIS</span>
+                        </div>
+                        <div class="partner-logo animate-glow">
+                            <span class="logo-text">GHD</span>
+                            <span class="logo-subtext">HAUTE COIFFURE</span>
+                        </div>
+                        <div class="partner-logo animate-glow">
+                            <span class="logo-text">AUTHENTIC</span>
+                            <span class="logo-subtext">BEAUTY CONCEPT</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- SECTION 5 : L'Expérience au Salon & Contact -->
+        <section id="contact" class="contact-section">
+            <div class="container">
+                <div class="contact-grid">
+                    
+                    <!-- Contact Info & Invitation -->
+                    <div class="contact-info-panel">
+                        <span class="section-subtitle">L'Échappée Sensorielle</span>
+                        <h2 class="section-title">Entrez chez Jérôme Romanyck</h2>
+                        <p class="contact-lead">Nous vous accueillons au cœur d'un studio d'exception à Lyon pour donner vie à vos projets capillaires les plus exigeants.</p>
+                        
+                        <div class="info-items">
+                            <div class="info-item">
+                                <div class="info-icon"><i class="fa-solid fa-location-dot"></i></div>
+                                <div class="info-text">
+                                    <h5>Le Studio</h5>
+                                    <p>62 Avenue Maréchal de Saxe, 69003 Lyon</p>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="info-icon"><i class="fa-solid fa-clock"></i></div>
+                                <div class="info-text">
+                                    <h5>Horaires</h5>
+                                    <p>Mardi — Vendredi : 9h00 – 20h00<br>Samedi : 9h00 – 19h00<br>Fermé le Dimanche & Lundi</p>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="info-icon"><i class="fa-solid fa-phone"></i></div>
+                                <div class="info-text">
+                                    <h5>Téléphone</h5>
+                                    <p><a href="tel:+33478604621">+33 (0)4 78 60 46 21</a> / <a href="tel:0478604621">04 78 60 46 21</a></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Google Maps Embed & Interactive Card Badge -->
+                        <div class="luxury-map-container">
+                            <div class="maps-iframe-wrapper">
+                                <iframe 
+                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2783.356531989445!2d4.846513576793617!3d45.763042413538426!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47f4ea61d0bfb9f9%3A0x6bd7ebc07ea86d23!2s62%20Av.%20Mar%C3%A9chal%20de%20Saxe%2C%2069003%20Lyon!5e0!3m2!1sfr!2sfr!4v1716393120000!5m2!1sfr!2sfr" 
+                                    width="100%" 
+                                    height="200" 
+                                    style="border:0;" 
+                                    allowfullscreen="" 
+                                    loading="lazy" 
+                                    referrerpolicy="no-referrer-when-downgrade">
+                                </iframe>
+                            </div>
+                            
+                            <a href="https://www.google.com/maps/search/?api=1&query=Romanyck+Coiffure+Lyon+62+Avenue+Marechal+de+Saxe" target="_blank" class="maps-card-badge">
+                                <img src="assets/maps_card.png" alt="Fiche Google Maps Romanyck Coiffure Lyon" class="maps-card-img">
+                                <div class="badge-overlay">
+                                    <span class="badge-text"><i class="fa-solid fa-diamond-turn-right"></i> Itinéraire Google Maps</span>
+                                </div>
+                            </a>
+                            
+                            <p class="map-label">
+                                <i class="fa-solid fa-square-parking"></i> Parking Saxe-Bonnel à 100m | Métro : Place Guichard (Ligne B) ou Cordeliers (Ligne A) à 5 min
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Booking Form -->
+                    <div class="contact-form-panel">
+                        <div class="form-container">
+                            <h3>Planifier un Rendez-vous</h3>
+                            <p>Remplissez cette demande. Notre équipe vous recontactera dans l'heure pour valider votre heure de passage.</p>
+                            
+                            <form id="bookingForm" onsubmit="event.preventDefault(); alert('Votre demande a bien été envoyée. Notre assistant de studio vous recontacte dans les plus brefs délais.');">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="name">Votre Nom Complet</label>
+                                        <input type="text" id="name" required placeholder="Ex: Jean Dupont">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="phone">Numéro de Téléphone</label>
+                                        <input type="tel" id="phone" required placeholder="Ex: 06 12 34 56 78">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="email">Adresse E-mail</label>
+                                    <input type="email" id="email" required placeholder="Ex: jean.dupont@email.com">
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="service-cat">Type de Prestation</label>
+                                        <select id="service-cat" required>
+                                            <option value="">Sélectionnez un service...</option>
+                                            <option value="femme-coupe">Rituel Coupe & Coiffage Femme</option>
+                                            <option value="homme-coupe">Coupe Studio Homme</option>
+                                            <option value="color-expert">Coloration / Balayage Expert</option>
+                                            <option value="soin-profond">Soin Intense Reconstructeur</option>
+                                            <option value="diagnostic">Diagnostic Complet (Consultation)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="date-pref">Date Souhaitée</label>
+                                        <input type="date" id="date-pref" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="message">Vos instructions ou inspirations (optionnel)</label>
+                                    <textarea id="message" rows="3" placeholder="Décrivez votre projet (changement de couleur, coupe graphique...) ou vos préférences de styliste..."></textarea>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-block">Envoyer ma Demande de Réservation</button>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container footer-container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <a href="#" class="logo">
+                        <span class="logo-main">ROMANYCK</span>
+                        <span class="logo-sub">COIFFURE</span>
+                    </a>
+                    <p class="brand-quote">L'harmonie ultime des volumes et de la lumière.</p>
+                </div>
+                
+                <div class="footer-links">
+                    <div class="link-group">
+                        <h6>Le Studio</h6>
+                        <a href="#accueil">Accueil</a>
+                        <a href="#expertise">L'Expertise</a>
+                        <a href="#galerie">Le Lieu en Images</a>
+                    </div>
+                    <div class="link-group">
+                        <h6>Prestations</h6>
+                        <a href="#tarifs">Tarifs Femme</a>
+                        <a href="#tarifs">Tarifs Homme</a>
+                        <a href="#tarifs">Colorimétrie & Balayage</a>
+                    </div>
+                    <div class="link-group">
+                        <h6>Légal</h6>
+                        <a href="#">Mentions Légales</a>
+                        <a href="#">Confidentialité</a>
+                        <a href="#">Conditions Générales</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p class="copyright">&copy; 2026 Romanyck Coiffure. Tous droits réservés. Conçu pour l'excellence.</p>
+                <div class="social-links">
+                    <a href="#" aria-label="Instagram Romanyck Coiffure"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" aria-label="Facebook Romanyck Coiffure"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Pinterest Romanyck Coiffure"><i class="fa-brands fa-pinterest-p"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bouton de retour en haut (Back to Top) -->
+    <a href="#" class="back-to-top" id="backToTop" aria-label="Retourner en haut de la page">
+        <i class="fa-solid fa-arrow-up"></i>
+    </a>
+
+    <!-- Bouton de réservation flottant de prestige (Glassmorphic CTA) -->
+    <a href="#contact" class="floating-booking" id="floatingBooking" aria-label="Planifier un rendez-vous">
+        <span class="floating-icon"><i class="fa-solid fa-calendar-check"></i></span>
+        <span class="floating-text">Réserver</span>
+    </a>
+
+    <!-- Interactive Script -->
+    <script src="script.js"></script>
+</body>
+</html>
