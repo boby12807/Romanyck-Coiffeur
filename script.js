@@ -365,4 +365,92 @@ document.addEventListener('DOMContentLoaded', () => {
         startAutoplay();
     }
 
+    // 8. DYNAMIC BOOKING FORM SUBMISSION WITH PREMIUM SUCCESS CARD
+    const bookingForm = document.getElementById('bookingForm');
+    if (bookingForm) {
+        bookingForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = bookingForm.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            
+            // Activate loading state on button
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Envoi en cours...';
+            
+            const formData = new FormData(bookingForm);
+            
+            // Handle key fallback to prevent errors during local testing
+            let accessKey = formData.get('access_key');
+            if (accessKey === 'YOUR_ACCESS_KEY_HERE') {
+                // Demo fallback simulation
+                setTimeout(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                    
+                    // Show a premium success message on screen
+                    const formContainer = bookingForm.parentElement;
+                    formContainer.innerHTML = `
+                        <div class="booking-success-card" style="text-align: center; padding: 40px 20px; animation: fadeInUp 0.6s ease forwards;">
+                            <div class="success-icon" style="font-size: 60px; color: #c5a880; margin-bottom: 20px;">
+                                <i class="fa-regular fa-circle-check"></i>
+                            </div>
+                            <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 28px; color: #fff; margin-bottom: 15px;">Demande Reçue !</h3>
+                            <p style="color: #a0a5a8; font-size: 15px; line-height: 1.6; margin-bottom: 25px;">
+                                [Mode Démo] Votre demande a été interceptée avec succès. <br>
+                                Les e-mails seront envoyés à <strong>romanyckj@gmail.com</strong> (avec copie à <strong>soltis69@yahoo.fr</strong>) dès que vous aurez inséré votre clé Web3Forms dans le fichier <code>index.html</code> (ligne 655).
+                            </p>
+                            <a href="#" onclick="window.location.reload(); return false;" class="btn btn-primary btn-sm">Faire une autre demande</a>
+                        </div>
+                    `;
+                }, 1500);
+                return;
+            }
+            
+            // Real Web3Forms submission
+            try {
+                // Convert form data to JSON object
+                const object = Object.fromEntries(formData);
+                const json = JSON.stringify(object);
+                
+                const response = await fetch('https://api.web3forms.com/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: json
+                });
+                
+                const result = await response.json();
+                
+                if (response.status === 200) {
+                    // Success! Show premium card
+                    const formContainer = bookingForm.parentElement;
+                    formContainer.innerHTML = `
+                        <div class="booking-success-card" style="text-align: center; padding: 40px 20px; animation: fadeInUp 0.6s ease forwards;">
+                            <div class="success-icon" style="font-size: 60px; color: #c5a880; margin-bottom: 20px;">
+                                <i class="fa-regular fa-circle-check"></i>
+                            </div>
+                            <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 28px; color: #fff; margin-bottom: 15px;">Rendez-vous Planifié !</h3>
+                            <p style="color: #a0a5a8; font-size: 15px; line-height: 1.6; margin-bottom: 25px;">
+                                Votre demande a bien été transmise à notre studio. <br>
+                                Un e-mail de confirmation vient d'être envoyé à l'adresse <strong>romanyckj@gmail.com</strong> (et une copie de test à <strong>soltis69@yahoo.fr</strong>). Nous vous recontacterons d'ici 1 heure pour valider votre diagnostic.
+                            </p>
+                            <a href="#" onclick="window.location.reload(); return false;" class="btn btn-primary btn-sm">Faire une autre demande</a>
+                        </div>
+                    `;
+                } else {
+                    throw new Error(result.message || "Erreur de soumission");
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Une erreur est survenue lors de l'envoi de votre demande : " + error.message);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
+        });
+    }
+
 });
+

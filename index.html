@@ -650,7 +650,13 @@
                             <h3>Planifier un Rendez-vous</h3>
                             <p>Remplissez cette demande. Notre équipe vous recontactera dans l'heure pour valider votre heure de passage.</p>
                             
-                            <form id="bookingForm" onsubmit="event.preventDefault(); alert('Votre demande a bien été envoyée. Notre assistant de studio vous recontacte dans les plus brefs délais.');">
+                            <form id="bookingForm">
+                                 <!-- Clé d'accès Web3Forms (à remplacer par votre clé gratuite reçue sur web3forms.com) -->
+                                 <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE">
+                                 <!-- Configuration des e-mails de destination : romanyckj@gmail.com (Principal) et soltis69@yahoo.fr (Secondaire / CC) -->
+                                 <input type="hidden" name="subject" value="Nouvelle Demande de Rendez-vous - Jérôme Romanyck Coiffure">
+                                 <input type="hidden" name="from_name" value="Assistant de Studio Romanyck">
+                                 <input type="hidden" name="cc" value="soltis69@yahoo.fr"> <!-- Adresse secondaire pour vos tests -->
                                 <div class="form-row">
                                     <div class="form-group">
                                         <label for="name">Votre Nom Complet</label>
