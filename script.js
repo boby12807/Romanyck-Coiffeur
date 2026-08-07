@@ -1,456 +1,531 @@
 /* ==========================================================================
-   ROMANYCK COIFFURE - INTERACTIVE UX SCRIPTS
+   ROMANYCK COIFFURE — INTERACTIONS ACCESSIBLES ET LÉGÈRES
    ========================================================================== */
 
-document.addEventListener('DOMContentLoaded', () => {
+document.documentElement.classList.add('js');
 
-    // 1. MOBILE NAVIGATION TOGGLE
+document.addEventListener('DOMContentLoaded', () => {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const mobileNavigation = window.matchMedia('(max-width: 1080px)');
+
+    // Galerie de travaux réels : données locales + ajouts enregistrés sur Vercel Blob
+    const realisationsGrid = document.getElementById('realisationsGrid');
+    const workFilters = document.getElementById('workFilters');
+    const normaliseRealisations = (items) => (
+        Array.isArray(items)
+            ? items
+            .filter((item) => (
+                item
+                && item.visible !== false
+                && item.category
+                && item.title
+                && item.before?.fallback
+                && item.before?.alt
+                && item.after?.fallback
+                && item.after?.alt
+            ))
+            .sort((a, b) => {
+                const orderDifference = (a.order ?? 100) - (b.order ?? 100);
+                if (orderDifference) return orderDifference;
+                return Date.parse(b.createdAt || 0) - Date.parse(a.createdAt || 0);
+            })
+            : []
+    );
+    const localRealisations = normaliseRealisations(window.ROMANYCK_REALISATIONS);
+
+    const createPicture = (image, label) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = `image-container ${label === 'Avant' ? 'before-image' : 'after-image'}`;
+
+        const picture = document.createElement('picture');
+        if (image.webp) {
+            const source = document.createElement('source');
+            source.srcset = image.webp;
+            source.type = 'image/webp';
+            picture.append(source);
+        }
+
+        const img = document.createElement('img');
+        img.src = image.fallback;
+        img.alt = image.alt;
+        img.width = image.width ?? 1200;
+        img.height = image.height ?? 1200;
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        picture.append(img);
+
+        const imageLabel = document.createElement('span');
+        imageLabel.className = `image-label ${label === 'Avant' ? 'label-before' : 'label-after'}`;
+        imageLabel.textContent = label;
+
+        wrapper.append(picture, imageLabel);
+        return wrapper;
+    };
+
+    const createRealisationCard = (item) => {
+        const card = document.createElement('article');
+        card.className = 'realisation-card';
+        card.dataset.category = item.category;
+
+        const comparison = document.createElement('div');
+        comparison.className = 'before-after-slider';
+        comparison.setAttribute('role', 'group');
+        comparison.setAttribute('aria-label', `Comparaison avant et après : ${item.title}`);
+
+        const range = document.createElement('input');
+        range.className = 'slider-range';
+        range.type = 'range';
+        range.min = '0';
+        range.max = '100';
+        range.value = '50';
+        range.setAttribute('aria-label', "Afficher davantage l'image avant ou après");
+
+        const updateComparison = () => {
+            const value = Number(range.value);
+            comparison.style.setProperty('--clip-pos', `${value}%`);
+            range.setAttribute('aria-valuetext', `${value} % de l'image avant visible`);
+        };
+        range.addEventListener('input', updateComparison);
+
+        const handle = document.createElement('div');
+        handle.className = 'slider-handle';
+        handle.setAttribute('aria-hidden', 'true');
+
+        const lineBefore = document.createElement('div');
+        lineBefore.className = 'handle-line';
+        const handleButton = document.createElement('div');
+        handleButton.className = 'handle-button';
+        const arrow = document.createElement('span');
+        arrow.className = 'symbol-icon';
+        arrow.setAttribute('aria-hidden', 'true');
+        arrow.textContent = '↔';
+        handleButton.append(arrow);
+        const lineAfter = document.createElement('div');
+        lineAfter.className = 'handle-line';
+        handle.append(lineBefore, handleButton, lineAfter);
+
+        comparison.append(
+            createPicture(item.before, 'Avant'),
+            createPicture(item.after, 'Après'),
+            range,
+            handle
+        );
+        updateComparison();
+
+        const meta = document.createElement('div');
+        meta.className = 'realisation-meta';
+        const headingGroup = document.createElement('div');
+        const category = document.createElement('span');
+        category.className = 'realisation-category';
+        category.textContent = item.category;
+        const title = document.createElement('h3');
+        title.textContent = item.title;
+        headingGroup.append(category, title);
+        const description = document.createElement('p');
+        description.textContent = item.description || '';
+        meta.append(headingGroup, description);
+
+        card.append(comparison, meta);
+        return card;
+    };
+
+    const renderRealisations = (items) => {
+        const realisations = normaliseRealisations(items);
+        if (!realisationsGrid || !realisations.length) return;
+
+        realisationsGrid.replaceChildren(...realisations.map(createRealisationCard));
+        realisationsGrid.classList.toggle('is-single', realisations.length === 1);
+
+        const categories = [...new Set(realisations.map((item) => item.category))];
+        workFilters?.classList.remove('is-visible');
+        workFilters?.replaceChildren();
+
+        if (workFilters && categories.length > 1) {
+            const createFilterButton = (label, value, active = false) => {
+                const button = document.createElement('button');
+                button.className = `work-filter-btn${active ? ' active' : ''}`;
+                button.type = 'button';
+                button.dataset.filter = value;
+                button.setAttribute('aria-pressed', String(active));
+                button.textContent = label;
+                return button;
+            };
+
+            workFilters.replaceChildren(
+                createFilterButton('Toutes', 'all', true),
+                ...categories.map((category) => createFilterButton(category, category))
+            );
+            workFilters.classList.add('is-visible');
+
+            workFilters.querySelectorAll('.work-filter-btn').forEach((button) => {
+                button.addEventListener('click', () => {
+                    workFilters.querySelectorAll('.work-filter-btn').forEach((candidate) => {
+                        const isActive = candidate === button;
+                        candidate.classList.toggle('active', isActive);
+                        candidate.setAttribute('aria-pressed', String(isActive));
+                    });
+
+                    realisationsGrid.querySelectorAll('.realisation-card').forEach((card) => {
+                        card.hidden = button.dataset.filter !== 'all'
+                            && card.dataset.category !== button.dataset.filter;
+                    });
+                });
+            });
+        }
+    };
+
+    renderRealisations(localRealisations);
+
+    const loadPublishedRealisations = async () => {
+        try {
+            const response = await fetch('/api/realisations', {
+                headers: { Accept: 'application/json' },
+                cache: 'no-store'
+            });
+            if (!response.ok) return;
+
+            const payload = await response.json();
+            const published = normaliseRealisations(payload.realisations);
+            if (published.length) renderRealisations([...published, ...localRealisations]);
+        } catch {
+            // Le site local continue d'afficher les réalisations intégrées au projet.
+        }
+    };
+
+    loadPublishedRealisations();
+
+    // Navigation mobile
     const mobileToggle = document.getElementById('mobileToggle');
     const navMenu = document.getElementById('navMenu');
-    
+
     if (mobileToggle && navMenu) {
-        mobileToggle.addEventListener('click', () => {
-            navMenu.classList.toggle('open');
-            mobileToggle.classList.toggle('active');
-            
-            // Toggle hamburger animation
-            const bars = mobileToggle.querySelectorAll('.bar');
-            if (mobileToggle.classList.contains('active')) {
-                bars[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
-                bars[1].style.opacity = '0';
-                bars[2].style.transform = 'rotate(-45deg) translate(7px, -7px)';
+        const setMenuState = (isOpen, returnFocus = false) => {
+            navMenu.classList.toggle('open', isOpen);
+            mobileToggle.classList.toggle('active', isOpen);
+            mobileToggle.setAttribute('aria-expanded', String(isOpen));
+            mobileToggle.setAttribute('aria-label', isOpen ? 'Fermer le menu' : 'Ouvrir le menu');
+            document.body.classList.toggle('nav-open', isOpen && mobileNavigation.matches);
+
+            if (mobileNavigation.matches) {
+                if (isOpen) {
+                    navMenu.removeAttribute('inert');
+                } else {
+                    navMenu.setAttribute('inert', '');
+                }
             } else {
-                bars[0].style.transform = 'none';
-                bars[1].style.opacity = '1';
-                bars[2].style.transform = 'none';
+                navMenu.removeAttribute('inert');
             }
+
+            if (isOpen) {
+                window.requestAnimationFrame(() => navMenu.querySelector('a')?.focus());
+            } else if (returnFocus) {
+                mobileToggle.focus();
+            }
+        };
+
+        const syncNavigation = () => setMenuState(false);
+        syncNavigation();
+        mobileNavigation.addEventListener('change', syncNavigation);
+
+        mobileToggle.addEventListener('click', () => {
+            setMenuState(mobileToggle.getAttribute('aria-expanded') !== 'true');
         });
 
-        // Close menu when clicking a link
-        const navLinks = navMenu.querySelectorAll('.nav-link');
-        navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                navMenu.classList.remove('open');
-                mobileToggle.classList.remove('active');
-                const bars = mobileToggle.querySelectorAll('.bar');
-                bars.forEach(bar => bar.style.transform = 'none');
-                bars[1].style.opacity = '1';
-            });
+        const menuLinks = [...navMenu.querySelectorAll('a')];
+
+        menuLinks.forEach((link) => {
+            link.addEventListener('click', () => setMenuState(false));
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && mobileToggle.getAttribute('aria-expanded') === 'true') {
+                setMenuState(false, true);
+            }
+
+            if (
+                event.key === 'Tab'
+                && mobileNavigation.matches
+                && mobileToggle.getAttribute('aria-expanded') === 'true'
+            ) {
+                const focusableItems = [mobileToggle, ...menuLinks];
+                const firstItem = focusableItems[0];
+                const lastItem = focusableItems[focusableItems.length - 1];
+
+                if (event.shiftKey && document.activeElement === firstItem) {
+                    event.preventDefault();
+                    lastItem.focus();
+                } else if (!event.shiftKey && document.activeElement === lastItem) {
+                    event.preventDefault();
+                    firstItem.focus();
+                }
+            }
         });
     }
 
-    // 2. PRICING TABS SYSTEM
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    const tabPanes = document.querySelectorAll('.tab-pane');
+    // État actif de la navigation
+    const navLinks = [...document.querySelectorAll('.nav-link[href^="#"]')];
+    const observedSections = navLinks
+        .map((link) => document.querySelector(link.getAttribute('href')))
+        .filter(Boolean);
 
-    tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            // Remove active class from all buttons and panes
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            tabPanes.forEach(pane => {
-                pane.classList.remove('active');
-                pane.style.display = 'none';
+    if ('IntersectionObserver' in window) {
+        const sectionObserver = new IntersectionObserver((entries) => {
+            const visible = entries
+                .filter((entry) => entry.isIntersecting)
+                .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+            if (!visible) return;
+
+            navLinks.forEach((link) => {
+                const isActive = link.getAttribute('href') === `#${visible.target.id}`;
+                link.classList.toggle('active', isActive);
+                if (isActive) link.setAttribute('aria-current', 'location');
+                else link.removeAttribute('aria-current');
             });
-
-            // Add active class to clicked button
-            button.classList.add('active');
-
-            // Find and activate the matching pane
-            const targetTabId = button.getAttribute('data-tab');
-            const targetPane = document.getElementById(targetTabId);
-            
-            if (targetPane) {
-                targetPane.style.display = 'block';
-                // Trigger reflow to restart animation
-                void targetPane.offsetWidth;
-                targetPane.classList.add('active');
-            }
-        });
-    });
-
-    // 3. SCROLL SPY (Highlight nav items on scroll)
-    const sections = document.querySelectorAll('section');
-    const navItems = document.querySelectorAll('.nav-link');
-
-    window.addEventListener('scroll', () => {
-        let current = '';
-        const scrollPosition = window.pageYOffset + 200; // Offset to trigger early
-
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.clientHeight;
-            if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-                current = section.getAttribute('id');
-            }
+        }, {
+            rootMargin: '-25% 0px -60% 0px',
+            threshold: [0, 0.25, 0.6]
         });
 
-        navItems.forEach(item => {
-            item.classList.remove('active');
-            if (item.getAttribute('href') === `#${current}`) {
-                item.classList.add('active');
-            }
-        });
-    });
+        observedSections.forEach((section) => sectionObserver.observe(section));
+    }
 
-    // 4. PREVENT SUNDAYS AND MONDAYS ON THE BOOKING CALENDAR (UX BEST PRACTICE)
+    // Date souhaitée
     const dateInput = document.getElementById('date-pref');
     if (dateInput) {
-        // Set minimum date to today
-        const today = new Date();
-        const yyyy = today.getFullYear();
-        let mm = today.getMonth() + 1; // Months start at 0
-        let dd = today.getDate();
+        const now = new Date();
+        const offset = now.getTimezoneOffset() * 60000;
+        dateInput.min = new Date(now.getTime() - offset).toISOString().split('T')[0];
 
-        if (dd < 10) dd = '0' + dd;
-        if (mm < 10) mm = '0' + mm;
-
-        const formattedToday = yyyy + '-' + mm + '-' + dd;
-        dateInput.setAttribute('min', formattedToday);
-
-        // Alert user if they choose a Sunday (0) or Monday (1)
-        dateInput.addEventListener('change', (e) => {
-            const day = new Date(e.target.value).getUTCDay();
-            if ([0, 1].includes(day)) {
-                alert("Le studio Romanyck Coiffure est fermé le dimanche et le lundi. Veuillez choisir un jour d'ouverture (du mardi au samedi).");
-                e.target.value = '';
+        const validateOpeningDay = () => {
+            if (!dateInput.value) {
+                dateInput.setCustomValidity('');
+                return;
             }
+
+            const day = new Date(`${dateInput.value}T12:00:00`).getDay();
+            dateInput.setCustomValidity(
+                day === 0 || day === 1
+                    ? 'Le salon est fermé le dimanche et le lundi. Choisissez une date du mardi au samedi.'
+                    : ''
+            );
+        };
+
+        dateInput.addEventListener('input', validateOpeningDay);
+        dateInput.addEventListener('change', () => {
+            validateOpeningDay();
+            if (!dateInput.checkValidity()) dateInput.reportValidity();
         });
     }
 
-    // 5. SUBTLE HERO IMAGE PARALLAX ON MOUSEMOVE
-    const heroImageWrapper = document.querySelector('.hero-image-wrapper');
-    const heroImg = document.querySelector('.hero-img');
-    
-    if (heroImageWrapper && heroImg) {
-        heroImageWrapper.addEventListener('mousemove', (e) => {
-            const rect = heroImageWrapper.getBoundingClientRect();
-            const x = e.clientX - rect.left - (rect.width / 2);
-            const y = e.clientY - rect.top - (rect.height / 2);
-            
-            // Move image slightly in opposite direction
-            heroImg.style.transform = `scale(1.05) translate(${x * -0.03}px, ${y * -0.03}px)`;
-        });
-
-        heroImageWrapper.addEventListener('mouseleave', () => {
-            heroImg.style.transform = 'scale(1) translate(0px, 0px)';
-        });
-    }
-
-    // 6. BACK TO TOP & FLOATING BOOKING BUTTONS ACTIVE STATE
-    const backToTop = document.getElementById('backToTop');
-    const floatingBooking = document.getElementById('floatingBooking');
-    
-    const handleScroll = () => {
-        const scrollY = window.scrollY !== undefined ? window.scrollY : window.pageYOffset;
-        
-        if (scrollY > 400) {
-            if (backToTop) backToTop.classList.add('active');
-            if (floatingBooking) floatingBooking.classList.add('active');
-        } else {
-            if (backToTop) backToTop.classList.remove('active');
-            if (floatingBooking) floatingBooking.classList.remove('active');
-        }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    
-    if (backToTop) {
-        backToTop.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
+    // Apparition progressive, désactivée en cas de préférence de mouvement réduit
+    const animatedElements = document.querySelectorAll('.fade-in-up, .step-card');
+    if (reducedMotion.matches || !('IntersectionObserver' in window)) {
+        animatedElements.forEach((element) => element.classList.add('animate-in'));
+    } else {
+        const animationObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('animate-in');
+                observer.unobserve(entry.target);
             });
-        });
+        }, { rootMargin: '0px 0px -40px', threshold: 0.1 });
+
+        animatedElements.forEach((element) => animationObserver.observe(element));
     }
 
-    // 7. SCROLL TRIGGER ANIMATIONS (FADE IN UP)
-    const animateElements = document.querySelectorAll('.fade-in-up, .step-card, .testimonial-card, .testimonial-slide');
-    
-    const triggerAnimations = () => {
-        animateElements.forEach(element => {
-            const elementTop = element.getBoundingClientRect().top;
-            const elementBottom = element.getBoundingClientRect().bottom;
-            
-            // Check if element is visible inside window height
-            if (elementTop < window.innerHeight - 50 && elementBottom > 0) {
-                element.classList.add('animate-in');
-            }
-        });
-    };
+    // Filtres de la galerie
+    const filterButtons = [...document.querySelectorAll('.filter-btn')];
+    const galleryItems = [...document.querySelectorAll('.gallery-item')];
 
-    // Run once on load
-    triggerAnimations();
-    // Run on scroll
-    window.addEventListener('scroll', triggerAnimations);
+    filterButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            const filter = button.dataset.filter;
 
+            filterButtons.forEach((candidate) => {
+                const isActive = candidate === button;
+                candidate.classList.toggle('active', isActive);
+                candidate.setAttribute('aria-pressed', String(isActive));
+            });
 
-    // ==========================================================================
-    // LOGIQUE DES COMPOSANTS INTERACTIFS DE PRESTIGE
-    // ==========================================================================
-
-    // A. SLIDER AVANT/APRÈS (BALAYAGE EN MOUVEMENT)
-    const slider = document.getElementById('balayageSlider');
-    const handle = document.getElementById('sliderHandle');
-    
-    if (slider && handle) {
-        const moveSlider = (clientX) => {
-            const rect = slider.getBoundingClientRect();
-            const x = clientX - rect.left;
-            let percentage = (x / rect.width) * 100;
-            
-            // Contenir le pourcentage entre 0% et 100%
-            if (percentage < 0) percentage = 0;
-            if (percentage > 100) percentage = 100;
-            
-            // Appliquer la propriété personnalisée CSS
-            slider.style.setProperty('--clip-pos', `${percentage}%`);
-        };
-
-        const handleMove = (e) => {
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            moveSlider(clientX);
-        };
-
-        let isDragging = false;
-
-        const startDragging = (e) => {
-            isDragging = true;
-            handleMove(e);
-            slider.classList.add('dragging');
-        };
-
-        const stopDragging = () => {
-            isDragging = false;
-            slider.classList.remove('dragging');
-        };
-
-        handle.addEventListener('mousedown', startDragging);
-        window.addEventListener('mouseup', stopDragging);
-        window.addEventListener('mousemove', (e) => {
-            if (isDragging) handleMove(e);
-        });
-
-        handle.addEventListener('touchstart', startDragging, { passive: true });
-        window.addEventListener('touchend', stopDragging);
-        window.addEventListener('touchmove', (e) => {
-            if (isDragging) handleMove(e);
-        }, { passive: true });
-
-        // Un clic sur le slider repositionne également la barre
-        slider.addEventListener('click', (e) => {
-            if (e.target !== handle && !handle.contains(e.target)) {
-                handleMove(e);
-            }
-        });
-    }
-
-    // B. FILTRAGE DYNAMIQUE DE LA GALERIE
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    const galleryItems = document.querySelectorAll('.gallery-item');
-
-    filterButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            // Permuter la classe active
-            filterButtons.forEach(button => button.classList.remove('active'));
-            btn.classList.add('active');
-
-            const filterValue = btn.getAttribute('data-filter');
-
-            galleryItems.forEach(item => {
-                const itemCat = item.getAttribute('data-category');
-                
-                if (filterValue === 'all' || itemCat === filterValue) {
-                    item.style.display = 'block';
-                    setTimeout(() => {
-                        item.classList.remove('hide');
-                    }, 20);
-                } else {
-                    item.classList.add('hide');
-                    setTimeout(() => {
-                        if (item.classList.contains('hide')) {
-                            item.style.display = 'none';
-                        }
-                    }, 600); // Correspond à la durée de la transition CSS
-                }
+            galleryItems.forEach((item) => {
+                item.hidden = filter !== 'all' && item.dataset.category !== filter;
             });
         });
     });
 
-    // C. CARROUSEL DE TÉMOIGNAGES (LIVRE D'OR)
-    const testimonialsSlider = document.getElementById('testimonialsSlider');
-    const testimonialSlides = document.querySelectorAll('.testimonial-slide');
-    const testimonialDots = document.querySelectorAll('.slider-dots .dot');
-    const prevBtn = document.getElementById('prevSlide');
-    const nextBtn = document.getElementById('nextSlide');
-    
-    if (testimonialsSlider && testimonialSlides.length > 0) {
-        let currentSlide = 0;
-        let autoplayTimer = null;
-        
-        const updateSlider = (index) => {
-            currentSlide = index;
-            
-            // Bouclage des index
-            if (currentSlide < 0) currentSlide = testimonialSlides.length - 1;
-            if (currentSlide >= testimonialSlides.length) currentSlide = 0;
-            
-            // Appliquer la translation horizontale
-            testimonialsSlider.style.transform = `translateX(-${currentSlide * 100}%)`;
-            
-            // Mettre à jour l'opacité et l'échelle de la slide active
-            testimonialSlides.forEach((slide, idx) => {
-                if (idx === currentSlide) {
-                    slide.classList.add('active');
-                } else {
-                    slide.classList.remove('active');
-                }
-            });
-            
-            // Mettre à jour l'état des points de contrôle
-            testimonialDots.forEach((dot, idx) => {
-                if (idx === currentSlide) {
-                    dot.classList.add('active');
-                } else {
-                    dot.classList.remove('active');
-                }
-            });
-        };
-        
-        const startAutoplay = () => {
-            stopAutoplay();
-            autoplayTimer = setInterval(() => {
-                updateSlider(currentSlide + 1);
-            }, 5000);
-        };
-        
-        const stopAutoplay = () => {
-            if (autoplayTimer) {
-                clearInterval(autoplayTimer);
-                autoplayTimer = null;
-            }
-        };
-        
-        if (prevBtn) {
-            prevBtn.addEventListener('click', () => {
-                updateSlider(currentSlide - 1);
-                startAutoplay(); // Réinitialise la minuterie
-            });
-        }
-        
-        if (nextBtn) {
-            nextBtn.addEventListener('click', () => {
-                updateSlider(currentSlide + 1);
-                startAutoplay(); // Réinitialise la minuterie
-            });
-        }
-        
-        testimonialDots.forEach(dot => {
-            dot.addEventListener('click', (e) => {
-                const index = parseInt(e.target.getAttribute('data-index'));
-                updateSlider(index);
-                startAutoplay(); // Réinitialise la minuterie
+    // Agrandissement accessible des photos de produits
+    const galleryLightbox = document.getElementById('galleryLightbox');
+    const lightboxImage = document.getElementById('lightboxImage');
+    const lightboxTitle = document.getElementById('lightboxTitle');
+    const lightboxClose = document.getElementById('lightboxClose');
+    let activeLightboxTrigger = null;
+
+    const closeLightbox = () => {
+        if (!galleryLightbox) return;
+        if (typeof galleryLightbox.close === 'function') galleryLightbox.close();
+        else galleryLightbox.removeAttribute('open');
+    };
+
+    if (galleryLightbox && lightboxImage && lightboxTitle) {
+        document.querySelectorAll('.gallery-lightbox-trigger').forEach((trigger) => {
+            trigger.addEventListener('click', () => {
+                activeLightboxTrigger = trigger;
+                lightboxImage.src = trigger.dataset.lightboxSrc;
+                lightboxImage.alt = trigger.dataset.lightboxAlt;
+                lightboxTitle.textContent = trigger.dataset.lightboxTitle;
+                document.body.classList.add('lightbox-open');
+
+                if (typeof galleryLightbox.showModal === 'function') galleryLightbox.showModal();
+                else galleryLightbox.setAttribute('open', '');
             });
         });
-        
-        // Mettre en pause le défilement automatique au survol
-        const wrapper = document.querySelector('.testimonials-slider-wrapper');
-        if (wrapper) {
-            wrapper.addEventListener('mouseenter', stopAutoplay);
-            wrapper.addEventListener('mouseleave', startAutoplay);
-        }
-        
-        // Initialisation du carrousel
-        updateSlider(0);
-        startAutoplay();
+
+        lightboxClose?.addEventListener('click', closeLightbox);
+
+        galleryLightbox.addEventListener('click', (event) => {
+            if (event.target === galleryLightbox) closeLightbox();
+        });
+
+        galleryLightbox.addEventListener('close', () => {
+            document.body.classList.remove('lightbox-open');
+            lightboxImage.removeAttribute('src');
+            lightboxImage.alt = '';
+            activeLightboxTrigger?.focus();
+            activeLightboxTrigger = null;
+        });
     }
 
-    // 8. DYNAMIC BOOKING FORM SUBMISSION WITH PREMIUM SUCCESS CARD
+    // Boutons flottants avec un seul gestionnaire de défilement limité
+    const backToTop = document.getElementById('backToTop');
+    const floatingBooking = document.getElementById('floatingBooking');
+    const reservationPanel = document.getElementById('reservation');
+    const realisationsSection = document.getElementById('realisations');
+    let scrollFrameRequested = false;
+
+    const updateFloatingActions = () => {
+        const isVisible = window.scrollY > 250;
+        const reservationRect = reservationPanel?.getBoundingClientRect();
+        const realisationsRect = realisationsSection?.getBoundingClientRect();
+        const reservationIsVisible = Boolean(
+            reservationRect
+            && reservationRect.top < window.innerHeight * 0.85
+            && reservationRect.bottom > Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-height'), 10)
+        );
+        const realisationsAreVisible = Boolean(
+            realisationsRect
+            && realisationsRect.top < window.innerHeight * 0.9
+            && realisationsRect.bottom > Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-height'), 10)
+        );
+
+        backToTop?.classList.toggle('active', isVisible && !realisationsAreVisible);
+        floatingBooking?.classList.toggle('active', isVisible && !reservationIsVisible && !realisationsAreVisible);
+        scrollFrameRequested = false;
+    };
+
+    window.addEventListener('scroll', () => {
+        if (scrollFrameRequested) return;
+        scrollFrameRequested = true;
+        window.requestAnimationFrame(updateFloatingActions);
+    }, { passive: true });
+    updateFloatingActions();
+
+    backToTop?.addEventListener('click', (event) => {
+        event.preventDefault();
+        window.scrollTo({ top: 0, behavior: reducedMotion.matches ? 'auto' : 'smooth' });
+    });
+
+    // Formulaire : aucun succès n'est affiché sans réponse positive du serveur
     const bookingForm = document.getElementById('bookingForm');
-    if (bookingForm) {
-        bookingForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const submitBtn = bookingForm.querySelector('button[type="submit"]');
-            const originalBtnText = submitBtn.innerHTML;
-            
-            // Activate loading state on button
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Envoi en cours...';
-            
-            const formData = new FormData(bookingForm);
-            
-            // Handle key fallback to prevent errors during local testing
-            let accessKey = formData.get('access_key');
-            if (accessKey === 'YOUR_ACCESS_KEY_HERE') {
-                // Demo fallback simulation
-                setTimeout(() => {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalBtnText;
-                    
-                    // Show a premium success message on screen
-                    const formContainer = bookingForm.parentElement;
-                    formContainer.innerHTML = `
-                        <div class="booking-success-card" style="text-align: center; padding: 40px 20px; animation: fadeInUp 0.6s ease forwards;">
-                            <div class="success-icon" style="font-size: 60px; color: #c5a880; margin-bottom: 20px;">
-                                <i class="fa-regular fa-circle-check"></i>
-                            </div>
-                            <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 28px; color: #fff; margin-bottom: 15px;">Demande Reçue !</h3>
-                            <p style="color: #a0a5a8; font-size: 15px; line-height: 1.6; margin-bottom: 25px;">
-                                [Mode Démo] Votre demande a été interceptée avec succès. <br>
-                                Les e-mails seront envoyés à <strong>romanyckj@gmail.com</strong> (avec copie à <strong>soltis69@yahoo.fr</strong>) dès que vous aurez inséré votre clé Web3Forms dans le fichier <code>index.html</code> (ligne 655).
-                            </p>
-                            <a href="#" onclick="window.location.reload(); return false;" class="btn btn-primary btn-sm">Faire une autre demande</a>
-                        </div>
-                    `;
-                }, 1500);
+    const formStatus = document.getElementById('formStatus');
+
+    if (bookingForm && formStatus) {
+        const submitButton = bookingForm.querySelector('button[type="submit"]');
+
+        const setStatus = (message, type = '') => {
+            formStatus.textContent = message;
+            formStatus.className = `form-status${type ? ` is-${type}` : ''}`;
+            formStatus.focus({ preventScroll: true });
+        };
+
+        const showUnavailableMessage = () => {
+            const phoneLink = document.createElement('a');
+            phoneLink.href = 'tel:+33478604621';
+            phoneLink.textContent = '04 78 60 46 21';
+
+            formStatus.replaceChildren(
+                document.createTextNode("L'envoi en ligne n'est pas encore activé. Appelez le "),
+                phoneLink,
+                document.createTextNode(' pour demander votre rendez-vous.')
+            );
+            formStatus.className = 'form-status is-error';
+            formStatus.focus();
+        };
+
+        bookingForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            formStatus.replaceChildren();
+            formStatus.className = 'form-status';
+
+            if (!bookingForm.checkValidity()) {
+                bookingForm.reportValidity();
+                setStatus('Vérifiez les champs obligatoires signalés dans le formulaire.', 'error');
                 return;
             }
-            
-            // Real Web3Forms submission
+
+            if (bookingForm.elements.website?.value) return;
+
+            const endpoint = bookingForm.dataset.endpoint?.trim();
+            if (!endpoint) {
+                showUnavailableMessage();
+                return;
+            }
+
+            let endpointUrl;
             try {
-                // Convert form data to JSON object
-                const object = Object.fromEntries(formData);
-                const json = JSON.stringify(object);
-                
-                const response = await fetch('https://api.web3forms.com/submit', {
+                endpointUrl = new URL(endpoint, window.location.href);
+                const localDevelopment = endpointUrl.hostname === 'localhost' || endpointUrl.hostname === '127.0.0.1';
+                if (endpointUrl.protocol !== 'https:' && !localDevelopment) throw new Error('Endpoint non sécurisé');
+            } catch {
+                showUnavailableMessage();
+                return;
+            }
+
+            submitButton.disabled = true;
+            submitButton.setAttribute('aria-busy', 'true');
+            setStatus('Envoi de votre demande…');
+
+            const controller = new AbortController();
+            const timeoutId = window.setTimeout(() => controller.abort(), 12000);
+
+            try {
+                const formData = new FormData(bookingForm);
+                const payload = Object.fromEntries(formData.entries());
+                const response = await fetch(endpointUrl, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json'
                     },
-                    body: json
+                    body: JSON.stringify(payload),
+                    signal: controller.signal
                 });
-                
-                const result = await response.json();
-                
-                if (response.status === 200) {
-                    // Success! Show premium card
-                    const formContainer = bookingForm.parentElement;
-                    formContainer.innerHTML = `
-                        <div class="booking-success-card" style="text-align: center; padding: 40px 20px; animation: fadeInUp 0.6s ease forwards;">
-                            <div class="success-icon" style="font-size: 60px; color: #c5a880; margin-bottom: 20px;">
-                                <i class="fa-regular fa-circle-check"></i>
-                            </div>
-                            <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 28px; color: #fff; margin-bottom: 15px;">Rendez-vous Planifié !</h3>
-                            <p style="color: #a0a5a8; font-size: 15px; line-height: 1.6; margin-bottom: 25px;">
-                                Votre demande a bien été transmise à notre studio. <br>
-                                Un e-mail de confirmation vient d'être envoyé à l'adresse <strong>romanyckj@gmail.com</strong> (et une copie de test à <strong>soltis69@yahoo.fr</strong>). Nous vous recontacterons d'ici 1 heure pour valider votre diagnostic.
-                            </p>
-                            <a href="#" onclick="window.location.reload(); return false;" class="btn btn-primary btn-sm">Faire une autre demande</a>
-                        </div>
-                    `;
-                } else {
-                    throw new Error(result.message || "Erreur de soumission");
-                }
+
+                if (!response.ok) throw new Error(`Réponse HTTP ${response.status}`);
+
+                bookingForm.reset();
+                setStatus('Votre demande a bien été transmise. Le salon vous recontactera pour confirmer le créneau.', 'success');
             } catch (error) {
-                console.error(error);
-                alert("Une erreur est survenue lors de l'envoi de votre demande : " + error.message);
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalBtnText;
+                console.error('Échec de la demande de rendez-vous', error);
+                setStatus("La demande n'a pas pu être envoyée. Appelez le 04 78 60 46 21.", 'error');
+            } finally {
+                window.clearTimeout(timeoutId);
+                submitButton.disabled = false;
+                submitButton.removeAttribute('aria-busy');
             }
         });
     }
 
+    const currentYear = document.getElementById('currentYear');
+    if (currentYear) currentYear.textContent = String(new Date().getFullYear());
 });
-
