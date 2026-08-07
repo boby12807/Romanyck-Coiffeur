@@ -27,6 +27,7 @@ Dans **Project Settings → Environment Variables**, ajoutez :
 | Variable | Valeur |
 |---|---|
 | `ADMIN_UPLOAD_PASSWORD` | Un mot de passe long réservé au propriétaire du salon |
+| `ADMIN_SESSION_SECRET` | Une longue valeur aléatoire différente du mot de passe |
 | `GMAIL_USER` | `romanyckj@gmail.com` |
 | `GMAIL_APP_PASSWORD` | Le mot de passe d’application Google à 16 caractères |
 
@@ -47,4 +48,5 @@ fichiers du projet.
 
 1. Envoyez une demande de rendez-vous depuis le formulaire.
 2. Vérifiez sa réception dans `romanyckj@gmail.com`, y compris le dossier spam.
-3. Ouvrez `/admin.html`, ajoutez une paire avant / après, puis vérifiez son affichage public.
+3. Ouvrez `/admin.html`, connectez-vous, ajoutez une paire avant / après, puis testez la
+   modification, la visibilité, l’ordre et la suppression.

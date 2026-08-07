@@ -131,14 +131,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const renderRealisations = (items) => {
         const realisations = normaliseRealisations(items);
-        if (!realisationsGrid || !realisations.length) return;
+        if (!realisationsGrid) return;
+
+        workFilters?.classList.remove('is-visible');
+        workFilters?.replaceChildren();
+        if (!realisations.length) {
+            const empty = document.createElement('p');
+            empty.className = 'realisations-empty';
+            empty.textContent = 'Les nouvelles réalisations du salon seront bientôt publiées ici.';
+            realisationsGrid.replaceChildren(empty);
+            realisationsGrid.classList.remove('is-single');
+            return;
+        }
 
         realisationsGrid.replaceChildren(...realisations.map(createRealisationCard));
         realisationsGrid.classList.toggle('is-single', realisations.length === 1);
 
         const categories = [...new Set(realisations.map((item) => item.category))];
-        workFilters?.classList.remove('is-visible');
-        workFilters?.replaceChildren();
 
         if (workFilters && categories.length > 1) {
             const createFilterButton = (label, value, active = false) => {
@@ -186,7 +195,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const payload = await response.json();
             const published = normaliseRealisations(payload.realisations);
-            if (published.length) renderRealisations([...published, ...localRealisations]);
+            const suppressedIds = new Set(Array.isArray(payload.suppressedIds) ? payload.suppressedIds : []);
+            const seen = new Set();
+            const merged = [...published, ...localRealisations]
+                .filter((item) => !item.id || !suppressedIds.has(item.id))
+                .filter((item) => {
+                    const key = item.id || item.before?.fallback;
+                    if (!key || seen.has(key)) return false;
+                    seen.add(key);
+                    return true;
+                });
+            renderRealisations(merged);
         } catch {
             // Le site local continue d'afficher les réalisations intégrées au projet.
         }
@@ -441,6 +460,92 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (bookingForm && formStatus) {
         const submitButton = bookingForm.querySelector('button[type="submit"]');
+        const dateInput = bookingForm.querySelector('#date-pref');
+        const startedAtInput = bookingForm.querySelector('#formStartedAt');
+        const projectPhotoInput = bookingForm.querySelector('#projectPhoto');
+        const projectPhotoPreview = bookingForm.querySelector('#projectPhotoPreview');
+        let projectPhotoUrl = '';
+
+        const formatLocalDate = (date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
+        const configureBookingDates = () => {
+            if (!dateInput) return;
+            const today = new Date();
+            const maximum = new Date(today);
+            maximum.setFullYear(maximum.getFullYear() + 1);
+            dateInput.min = formatLocalDate(today);
+            dateInput.max = formatLocalDate(maximum);
+        };
+
+        const validateBookingDate = () => {
+            if (!dateInput?.value) return;
+            const day = new Date(`${dateInput.value}T12:00:00`).getDay();
+            dateInput.setCustomValidity(day === 0 || day === 1
+                ? 'Le salon reçoit les demandes du mardi au samedi.'
+                : '');
+        };
+
+        configureBookingDates();
+        validateBookingDate();
+        dateInput?.addEventListener('change', validateBookingDate);
+        if (startedAtInput) startedAtInput.value = String(Date.now());
+
+        projectPhotoInput?.addEventListener('change', () => {
+            if (projectPhotoUrl) URL.revokeObjectURL(projectPhotoUrl);
+            const file = projectPhotoInput.files?.[0];
+            if (!file) {
+                projectPhotoPreview.hidden = true;
+                projectPhotoPreview.removeAttribute('src');
+                return;
+            }
+            projectPhotoUrl = URL.createObjectURL(file);
+            projectPhotoPreview.src = projectPhotoUrl;
+            projectPhotoPreview.alt = "Aperçu de la photo d'inspiration";
+            projectPhotoPreview.hidden = false;
+        });
+
+        const blobToDataUrl = (blob) => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.addEventListener('load', () => resolve(reader.result));
+            reader.addEventListener('error', () => reject(reader.error));
+            reader.readAsDataURL(blob);
+        });
+
+        const prepareProjectPhoto = async (file) => {
+            if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 15_000_000) {
+                throw new Error("La photo d’inspiration doit être une image JPG, PNG ou WebP de moins de 15 Mo.");
+            }
+            const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
+            const scale = Math.min(1, 1200 / Math.max(bitmap.width, bitmap.height));
+            const width = Math.max(1, Math.round(bitmap.width * scale));
+            const height = Math.max(1, Math.round(bitmap.height * scale));
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const context = canvas.getContext('2d', { alpha: false });
+            context.fillStyle = '#ffffff';
+            context.fillRect(0, 0, width, height);
+            context.drawImage(bitmap, 0, 0, width, height);
+            bitmap.close();
+            const blob = await new Promise((resolve, reject) => {
+                canvas.toBlob(
+                    (result) => result ? resolve(result) : reject(new Error("La photo n'a pas pu être préparée.")),
+                    'image/webp',
+                    0.78
+                );
+            });
+            if (blob.size > 900_000) throw new Error('La photo reste trop lourde après optimisation.');
+            return {
+                dataUrl: await blobToDataUrl(blob),
+                width,
+                height
+            };
+        };
 
         const setStatus = (message, type = '') => {
             formStatus.textContent = message;
@@ -466,6 +571,7 @@ document.addEventListener('DOMContentLoaded', () => {
             event.preventDefault();
             formStatus.replaceChildren();
             formStatus.className = 'form-status';
+            validateBookingDate();
 
             if (!bookingForm.checkValidity()) {
                 bookingForm.reportValidity();
@@ -496,11 +602,20 @@ document.addEventListener('DOMContentLoaded', () => {
             setStatus('Envoi de votre demande…');
 
             const controller = new AbortController();
-            const timeoutId = window.setTimeout(() => controller.abort(), 12000);
+            const timeoutId = window.setTimeout(() => controller.abort(), 20000);
 
             try {
                 const formData = new FormData(bookingForm);
                 const payload = Object.fromEntries(formData.entries());
+                delete payload.project_photo_file;
+                const selectedService = bookingForm.elements.service.selectedOptions?.[0];
+                payload.service_label = selectedService?.textContent || payload.service;
+                const projectPhoto = projectPhotoInput?.files?.[0];
+                if (projectPhoto) {
+                    setStatus('Optimisation de votre photo…');
+                    payload.project_photo = await prepareProjectPhoto(projectPhoto);
+                    setStatus('Envoi de votre demande…');
+                }
                 const response = await fetch(endpointUrl, {
                     method: 'POST',
                     headers: {
@@ -511,13 +626,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     signal: controller.signal
                 });
 
-                if (!response.ok) throw new Error(`Réponse HTTP ${response.status}`);
+                const responsePayload = await response.json().catch(() => ({}));
+                if (!response.ok) throw new Error(responsePayload.error || `Réponse HTTP ${response.status}`);
 
+                const confirmationSent = responsePayload.confirmationSent === true;
                 bookingForm.reset();
-                setStatus('Votre demande a bien été transmise. Le salon vous recontactera pour confirmer le créneau.', 'success');
+                configureBookingDates();
+                if (startedAtInput) startedAtInput.value = String(Date.now());
+                projectPhotoInput?.dispatchEvent(new Event('change'));
+                setStatus(
+                    confirmationSent
+                        ? 'Votre demande a bien été transmise. Un accusé de réception vient de vous être envoyé.'
+                        : 'Votre demande a bien été transmise. Le salon vous recontactera pour confirmer le créneau.',
+                    'success'
+                );
             } catch (error) {
                 console.error('Échec de la demande de rendez-vous', error);
-                setStatus("La demande n'a pas pu être envoyée. Appelez le 04 78 60 46 21.", 'error');
+                setStatus(error.message || "La demande n'a pas pu être envoyée. Appelez le 04 78 60 46 21.", 'error');
             } finally {
                 window.clearTimeout(timeoutId);
                 submitButton.disabled = false;

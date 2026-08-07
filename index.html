@@ -463,6 +463,7 @@
 
                             <form id="bookingForm" method="post" novalidate data-endpoint="/api/rendez-vous" aria-describedby="formIntro formPrivacy">
                                 <input type="hidden" name="subject" value="Nouvelle demande de rendez-vous - Romanyck Coiffure">
+                                <input type="hidden" id="formStartedAt" name="form_started_at" value="">
                                 <div class="honeypot" aria-hidden="true">
                                     <label for="website">Ne pas remplir ce champ</label>
                                     <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
@@ -479,7 +480,7 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="email">Adresse e-mail <span class="optional">(facultative)</span></label>
+                                    <label for="email">Adresse e-mail <span class="optional">(facultative, pour recevoir un accusé)</span></label>
                                     <input type="email" id="email" name="email" maxlength="120" autocomplete="email" placeholder="Ex. camille@email.fr">
                                 </div>
 
@@ -498,13 +499,20 @@
                                     <div class="form-group">
                                         <label for="date-pref">Date souhaitée&nbsp;*</label>
                                         <input type="date" id="date-pref" name="preferred_date" required aria-describedby="dateHelp">
-                                        <span class="field-help" id="dateHelp">Date indicative, confirmée ensuite par le salon.</span>
+                                        <span class="field-help" id="dateHelp">Date indicative du mardi au samedi, confirmée ensuite par le salon.</span>
                                     </div>
                                 </div>
 
                                 <div class="form-group">
                                     <label for="message">Votre projet <span class="optional">(facultatif)</span></label>
                                     <textarea id="message" name="message" rows="3" maxlength="800" placeholder="Quelques mots sur votre coupe, votre couleur ou le résultat recherché."></textarea>
+                                </div>
+
+                                <div class="form-group project-photo-field">
+                                    <label for="projectPhoto">Photo d’inspiration <span class="optional">(facultative)</span></label>
+                                    <input type="file" id="projectPhoto" name="project_photo_file" accept="image/jpeg,image/png,image/webp" aria-describedby="projectPhotoHelp">
+                                    <span class="field-help" id="projectPhotoHelp">JPG, PNG ou WebP. La photo est automatiquement réduite avant l’envoi.</span>
+                                    <img class="project-photo-preview" id="projectPhotoPreview" alt="" hidden>
                                 </div>
 
                                 <p class="privacy-summary" id="formPrivacy">Les champs marqués * sont nécessaires pour répondre à votre demande. Aucune prospection commerciale n'est imposée. <a href="informations-legales.html#confidentialite">En savoir plus sur vos données</a>.</p>

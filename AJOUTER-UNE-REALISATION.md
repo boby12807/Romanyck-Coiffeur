@@ -10,6 +10,9 @@ Une fois le site publié sur Vercel, ouvrez :
 4. Sélectionnez la photo **après**.
 5. Cliquez sur **Publier la réalisation**.
 
+Depuis la même page, vous pouvez ensuite modifier le titre, masquer ou afficher une
+réalisation, changer son ordre et la supprimer avec ses photos.
+
 Les photos sont automatiquement redimensionnées et converties en WebP avant l’envoi. Elles
 sont ensuite enregistrées dans Vercel Blob et apparaissent dans la rubrique « Avant / Après »
 du site public.
@@ -24,5 +27,5 @@ du site public.
 ## Protection
 
 La page d’administration demande le mot de passe défini dans la variable Vercel
-`ADMIN_UPLOAD_PASSWORD`. Ne partagez pas ce mot de passe et ne l’inscrivez jamais dans un
-fichier du site.
+`ADMIN_UPLOAD_PASSWORD`. La session est signée par `ADMIN_SESSION_SECRET`. Ne partagez pas
+ces valeurs et ne les inscrivez jamais dans un fichier du site.
