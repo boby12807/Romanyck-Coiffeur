@@ -1,5 +1,15 @@
-import { timingSafeEqual, randomUUID } from 'node:crypto';
-import { list, put } from '@vercel/blob';
+import { randomUUID } from 'node:crypto';
+import { del, list, put } from '@vercel/blob';
+import { hasAdminSession } from '../lib/admin-session.js';
+import {
+    cleanText,
+    consumeRateLimit,
+    getClientIp,
+    isSameOrigin,
+    parseDataImage,
+    readBody,
+    setSecurityHeaders
+} from '../lib/security.js';
 
 const ALLOWED_CATEGORIES = new Set([
     'Coupe',
@@ -10,162 +20,241 @@ const ALLOWED_CATEGORIES = new Set([
     'Transformation',
     'Soin'
 ]);
+const MAX_SINGLE_IMAGE_BYTES = 1_500_000;
 const MAX_COMBINED_IMAGE_BYTES = 3_000_000;
-
-const cleanText = (value, maximumLength) => (
-    typeof value === 'string'
-        ? value.trim().replace(/\s+/g, ' ').slice(0, maximumLength)
-        : ''
-);
-
-const passwordsMatch = (received, expected) => {
-    if (!received || !expected) return false;
-    const receivedBuffer = Buffer.from(received);
-    const expectedBuffer = Buffer.from(expected);
-    return receivedBuffer.length === expectedBuffer.length
-        && timingSafeEqual(receivedBuffer, expectedBuffer);
-};
-
-const parseDataImage = (dataUrl) => {
-    if (typeof dataUrl !== 'string') return null;
-    const match = dataUrl.match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/);
-    if (!match) return null;
-
-    const buffer = Buffer.from(match[2], 'base64');
-    if (!buffer.length) return null;
-
-    return {
-        buffer,
-        contentType: match[1],
-        extension: match[1] === 'image/png' ? 'png' : match[1] === 'image/webp' ? 'webp' : 'jpg'
-    };
-};
-
-const readBody = (request) => {
-    if (request.body && typeof request.body === 'object') return request.body;
-    if (typeof request.body === 'string') {
-        try {
-            return JSON.parse(request.body);
-        } catch {
-            return {};
-        }
+const ENTRY_PREFIX = 'realisations/entries/';
+const DEFAULT_REALISATIONS = [{
+    id: 'default-balayage-01',
+    order: 1,
+    visible: true,
+    createdAt: '2026-08-06T00:00:00.000Z',
+    category: 'Balayage',
+    title: 'Transformation avant / après',
+    description: 'Une réalisation effectuée au salon, présentée en comparaison avant et après.',
+    before: {
+        webp: 'assets/balayage_before.webp',
+        fallback: 'assets/balayage_before.jpg',
+        alt: 'Chevelure avant la prestation, vue de dos',
+        width: 1024,
+        height: 1024
+    },
+    after: {
+        webp: 'assets/balayage_after.webp',
+        fallback: 'assets/balayage_after.jpg',
+        alt: 'Chevelure après la prestation, vue de dos',
+        width: 1024,
+        height: 1024
     }
-    return {};
-};
+}];
 
-const readPublishedEntries = async () => {
-    const { blobs } = await list({
-        prefix: 'realisations/entries/',
-        limit: 100
-    });
+const sortEntries = (entries) => entries.sort((a, b) => {
+    const orderDifference = (a.order ?? 1000) - (b.order ?? 1000);
+    if (orderDifference) return orderDifference;
+    return Date.parse(b.createdAt || 0) - Date.parse(a.createdAt || 0);
+});
 
+const readStoredEntries = async () => {
+    const { blobs } = await list({ prefix: ENTRY_PREFIX, limit: 100 });
     const entries = await Promise.all(blobs.map(async (blob) => {
         try {
-            const response = await fetch(blob.url, { cache: 'no-store' });
-            return response.ok ? response.json() : null;
+            const result = await fetch(`${blob.url}?v=${blob.uploadedAt?.getTime?.() || Date.now()}`, {
+                cache: 'no-store'
+            });
+            if (!result.ok) return null;
+            return { metadataUrl: blob.url, data: await result.json() };
         } catch {
             return null;
         }
     }));
+    return entries.filter((entry) => entry?.data?.id);
+};
 
-    return entries
-        .filter(Boolean)
-        .sort((a, b) => Date.parse(b.createdAt || 0) - Date.parse(a.createdAt || 0));
+const readMergedEntries = async () => {
+    const stored = await readStoredEntries();
+    const storedIds = new Set(stored.map((entry) => entry.data.id));
+    return [
+        ...stored,
+        ...DEFAULT_REALISATIONS
+            .filter((entry) => !storedIds.has(entry.id))
+            .map((data) => ({ metadataUrl: null, data }))
+    ];
+};
+
+const writeEntry = async (entry) => put(
+    `${ENTRY_PREFIX}${entry.id}.json`,
+    JSON.stringify(entry),
+    {
+        access: 'public',
+        contentType: 'application/json; charset=utf-8',
+        addRandomSuffix: false,
+        allowOverwrite: true,
+        cacheControlMaxAge: 60
+    }
+);
+
+const validDimension = (value) => Number.isFinite(value) && value >= 200 && value <= 4000;
+
+const requireAdminMutation = (request, response) => {
+    if (!isSameOrigin(request)) {
+        response.status(403).json({ error: 'Origine de la demande refusée.' });
+        return false;
+    }
+    if (!hasAdminSession(request)) {
+        response.status(401).json({ error: 'Session administrateur expirée.' });
+        return false;
+    }
+    const rate = consumeRateLimit('admin-write', getClientIp(request), 40, 10 * 60 * 1000);
+    if (!rate.allowed) {
+        response.setHeader('Retry-After', String(rate.retryAfter));
+        response.status(429).json({ error: 'Trop de modifications rapprochées.' });
+        return false;
+    }
+    return true;
 };
 
 export default async function handler(request, response) {
-    response.setHeader('Cache-Control', 'no-store, max-age=0');
+    setSecurityHeaders(response);
 
-    if (request.method === 'GET') {
-        try {
-            const realisations = await readPublishedEntries();
-            return response.status(200).json({ realisations });
-        } catch (error) {
-            console.error('Erreur de lecture des réalisations', error);
-            return response.status(503).json({ realisations: [], error: 'Stockage indisponible.' });
+    try {
+        if (request.method === 'GET') {
+            const requestUrl = new URL(request.url, `https://${request.headers.host || 'localhost'}`);
+            const adminView = requestUrl.searchParams.get('admin') === '1';
+            if (adminView && !hasAdminSession(request)) {
+                return response.status(401).json({ error: 'Connexion administrateur requise.' });
+            }
+
+            const stored = await readMergedEntries();
+            const suppressedIds = stored
+                .map((entry) => entry.data)
+                .filter((entry) => entry.deleted || entry.visible === false)
+                .map((entry) => entry.id);
+            const realisations = sortEntries(stored.map((entry) => entry.data))
+                .filter((entry) => !entry.deleted && (adminView || entry.visible !== false));
+            return response.status(200).json({ realisations, suppressedIds: adminView ? [] : suppressedIds });
         }
-    }
 
-    if (request.method !== 'POST') {
-        response.setHeader('Allow', 'GET, POST');
-        return response.status(405).json({ error: 'Méthode non autorisée.' });
-    }
-
-    const body = readBody(request);
-    if (!passwordsMatch(body.password, process.env.ADMIN_UPLOAD_PASSWORD)) {
-        return response.status(401).json({ error: 'Mot de passe incorrect.' });
-    }
-
-    const title = cleanText(body.title, 90);
-    const description = cleanText(body.description, 240);
-    const category = cleanText(body.category, 40);
-    const before = parseDataImage(body.before?.dataUrl);
-    const after = parseDataImage(body.after?.dataUrl);
-    const beforeWidth = Number(body.before?.width);
-    const beforeHeight = Number(body.before?.height);
-    const afterWidth = Number(body.after?.width);
-    const afterHeight = Number(body.after?.height);
-
-    if (!title || !ALLOWED_CATEGORIES.has(category) || !before || !after) {
-        return response.status(400).json({ error: 'Titre, catégorie ou photos invalides.' });
-    }
-
-    if (before.buffer.length + after.buffer.length > MAX_COMBINED_IMAGE_BYTES) {
-        return response.status(413).json({ error: 'Les deux photos sont encore trop lourdes.' });
-    }
-
-    if (
-        !Number.isFinite(beforeWidth)
-        || !Number.isFinite(beforeHeight)
-        || !Number.isFinite(afterWidth)
-        || !Number.isFinite(afterHeight)
-    ) {
-        return response.status(400).json({ error: 'Dimensions des photos invalides.' });
-    }
-
-    const id = `${Date.now()}-${randomUUID()}`;
-    const beforeBlob = await put(
-        `realisations/media/${id}-avant.${before.extension}`,
-        before.buffer,
-        { access: 'public', contentType: before.contentType, addRandomSuffix: false }
-    );
-    const afterBlob = await put(
-        `realisations/media/${id}-apres.${after.extension}`,
-        after.buffer,
-        { access: 'public', contentType: after.contentType, addRandomSuffix: false }
-    );
-
-    const realisation = {
-        id,
-        order: 0,
-        visible: true,
-        createdAt: new Date().toISOString(),
-        category,
-        title,
-        description: description || 'Une réalisation effectuée au salon, présentée en comparaison avant et après.',
-        before: {
-            fallback: beforeBlob.url,
-            alt: `Chevelure avant la prestation ${category.toLowerCase()}`,
-            width: Math.round(beforeWidth),
-            height: Math.round(beforeHeight)
-        },
-        after: {
-            fallback: afterBlob.url,
-            alt: `Chevelure après la prestation ${category.toLowerCase()}`,
-            width: Math.round(afterWidth),
-            height: Math.round(afterHeight)
+        if (!['POST', 'PATCH', 'DELETE'].includes(request.method)) {
+            response.setHeader('Allow', 'GET, POST, PATCH, DELETE');
+            return response.status(405).json({ error: 'Méthode non autorisée.' });
         }
-    };
+        if (!requireAdminMutation(request, response)) return;
 
-    await put(
-        `realisations/entries/${id}.json`,
-        JSON.stringify(realisation),
-        {
-            access: 'public',
-            contentType: 'application/json; charset=utf-8',
-            addRandomSuffix: false
+        const body = readBody(request);
+
+        if (request.method === 'POST') {
+            const title = cleanText(body.title, 90);
+            const description = cleanText(body.description, 240);
+            const category = cleanText(body.category, 40);
+            const before = parseDataImage(body.before?.dataUrl, MAX_SINGLE_IMAGE_BYTES);
+            const after = parseDataImage(body.after?.dataUrl, MAX_SINGLE_IMAGE_BYTES);
+            const beforeWidth = Number(body.before?.width);
+            const beforeHeight = Number(body.before?.height);
+            const afterWidth = Number(body.after?.width);
+            const afterHeight = Number(body.after?.height);
+
+            if (!title || !ALLOWED_CATEGORIES.has(category) || !before || !after) {
+                return response.status(400).json({ error: 'Titre, catégorie ou photos invalides.' });
+            }
+            if (before.buffer.length + after.buffer.length > MAX_COMBINED_IMAGE_BYTES) {
+                return response.status(413).json({ error: 'Les deux photos sont encore trop lourdes.' });
+            }
+            if (![beforeWidth, beforeHeight, afterWidth, afterHeight].every(validDimension)) {
+                return response.status(400).json({ error: 'Dimensions des photos invalides.' });
+            }
+
+            const existing = await readMergedEntries();
+            const highestOrder = existing.reduce((maximum, entry) => (
+                Math.max(maximum, Number(entry.data.order) || 0)
+            ), 0);
+            const id = `${Date.now()}-${randomUUID()}`;
+            const beforeBlob = await put(
+                `realisations/media/${id}-avant.${before.extension}`,
+                before.buffer,
+                { access: 'public', contentType: before.contentType, addRandomSuffix: false }
+            );
+            const afterBlob = await put(
+                `realisations/media/${id}-apres.${after.extension}`,
+                after.buffer,
+                { access: 'public', contentType: after.contentType, addRandomSuffix: false }
+            );
+
+            const realisation = {
+                id,
+                order: highestOrder + 1,
+                visible: true,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                category,
+                title,
+                description: description || 'Une réalisation effectuée au salon, présentée en comparaison avant et après.',
+                before: {
+                    fallback: beforeBlob.url,
+                    alt: `Chevelure avant la prestation ${category.toLowerCase()}`,
+                    width: Math.round(beforeWidth),
+                    height: Math.round(beforeHeight)
+                },
+                after: {
+                    fallback: afterBlob.url,
+                    alt: `Chevelure après la prestation ${category.toLowerCase()}`,
+                    width: Math.round(afterWidth),
+                    height: Math.round(afterHeight)
+                }
+            };
+            await writeEntry(realisation);
+            return response.status(201).json({ success: true, realisation });
         }
-    );
 
-    return response.status(201).json({ success: true, realisation });
+        const id = cleanText(body.id, 120);
+        const stored = await readMergedEntries();
+        const current = stored.find((entry) => entry.data.id === id);
+        if (!current) return response.status(404).json({ error: 'Réalisation introuvable.' });
+
+        if (request.method === 'DELETE') {
+            const usesBundledImages = !String(current.data.before?.fallback || '').includes('.blob.vercel-storage.com/')
+                || !String(current.data.after?.fallback || '').includes('.blob.vercel-storage.com/');
+            if (usesBundledImages) {
+                await writeEntry({
+                    ...current.data,
+                    visible: false,
+                    deleted: true,
+                    updatedAt: new Date().toISOString()
+                });
+                return response.status(200).json({ success: true });
+            }
+            const urls = [
+                current.metadataUrl,
+                current.data.before?.fallback,
+                current.data.after?.fallback
+            ].filter((url) => typeof url === 'string' && url.includes('.blob.vercel-storage.com/'));
+            if (urls.length) await del(urls);
+            return response.status(200).json({ success: true });
+        }
+
+        const title = body.title === undefined ? current.data.title : cleanText(body.title, 90);
+        const description = body.description === undefined
+            ? current.data.description
+            : cleanText(body.description, 240);
+        const category = body.category === undefined ? current.data.category : cleanText(body.category, 40);
+        const visible = body.visible === undefined ? current.data.visible !== false : body.visible === true;
+        const order = body.order === undefined ? Number(current.data.order) : Number(body.order);
+
+        if (!title || !ALLOWED_CATEGORIES.has(category) || !Number.isInteger(order) || order < 1 || order > 1000) {
+            return response.status(400).json({ error: 'Modification invalide.' });
+        }
+
+        const updated = {
+            ...current.data,
+            title,
+            description,
+            category,
+            visible,
+            order,
+            updatedAt: new Date().toISOString()
+        };
+        await writeEntry(updated);
+        return response.status(200).json({ success: true, realisation: updated });
+    } catch (error) {
+        console.error('Erreur API réalisations', error);
+        return response.status(503).json({ error: 'Le stockage des réalisations est indisponible.' });
+    }
 }

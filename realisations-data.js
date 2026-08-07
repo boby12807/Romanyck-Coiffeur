@@ -7,6 +7,7 @@
  */
 window.ROMANYCK_REALISATIONS = [
     {
+        id: 'default-balayage-01',
         order: 1,
         visible: true,
         category: 'Balayage',
