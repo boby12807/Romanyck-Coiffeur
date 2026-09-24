@@ -35,11 +35,13 @@ export default async function handler(request, response) {
         return response.status(405).json({ error: 'Méthode non autorisée.' });
     }
 
-    if (!process.env.ADMIN_UPLOAD_PASSWORD) {
+    if (!process.env.ADMIN_UPLOAD_PASSWORD || !process.env.ADMIN_SESSION_SECRET
+        || process.env.ADMIN_UPLOAD_PASSWORD === process.env.ADMIN_SESSION_SECRET) {
         return response.status(503).json({ error: "L’accès administrateur n’est pas encore configuré." });
     }
 
-    const rate = consumeRateLimit('admin-login', getClientIp(request), 5, 15 * 60 * 1000);
+    const rate = await consumeRateLimit('admin-login', getClientIp(request), 5, 15 * 60 * 1000);
+    if (rate.unavailable) return response.status(503).json({ error: 'La connexion est temporairement indisponible.' });
     if (!rate.allowed) {
         response.setHeader('Retry-After', String(rate.retryAfter));
         return response.status(429).json({ error: 'Trop de tentatives. Réessayez plus tard.' });

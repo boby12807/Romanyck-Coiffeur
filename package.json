@@ -2,11 +2,16 @@
   "name": "romanyck-coiffure",
   "private": true,
   "type": "module",
+  "scripts": {
+    "test": "node --test"
+  },
   "engines": {
     "node": "24.x"
   },
   "dependencies": {
+    "@upstash/ratelimit": "^2.2.0",
+    "@upstash/redis": "^1.39.0",
     "@vercel/blob": "^2.0.0",
-    "nodemailer": "^9.0.0"
+    "nodemailer": "^9.1.1"
   }
 }

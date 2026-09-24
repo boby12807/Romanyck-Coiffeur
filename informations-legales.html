@@ -160,8 +160,8 @@
                     <span class="section-subtitle">2 — Données personnelles</span>
                     <h2 class="section-title" id="titre-confidentialite">Politique de confidentialité — brouillon</h2>
                     <p class="section-lead">
-                        Cette notice décrit le fonctionnement visible du prototype. Les pratiques réelles,
-                        les outils activés en production et les durées de conservation doivent encore être confirmés.
+                        Cette notice décrit les fonctions prévues dans le code. Les pratiques réelles,
+                        les prestataires activés et les durées de conservation doivent encore être confirmés.
                     </p>
                 </div>
 
@@ -172,12 +172,13 @@
                             <p class="card-text">
                                 Le formulaire de demande de rendez-vous présenté sur le site prévoit les champs
                                 suivants : prénom ou nom, téléphone, adresse électronique facultative, type de prestation,
-                                date souhaitée et message facultatif.
+                                date souhaitée, message facultatif et photo d’inspiration facultative.
                             </p>
                             <ul class="card-list">
                                 <li><span aria-hidden="true">—</span><span>Finalité annoncée : répondre à une demande et organiser un rendez-vous.</span></li>
                                 <li><span aria-hidden="true">—</span><span>Champs obligatoires affichés : prénom ou nom, téléphone, prestation et date.</span></li>
-                                <li><span aria-hidden="true">—</span><span>Champs facultatifs affichés : adresse e-mail et description du projet.</span></li>
+                                <li><span aria-hidden="true">—</span><span>Champs facultatifs affichés : adresse e-mail, description du projet et photo d’inspiration.</span></li>
+                                <li><span aria-hidden="true">—</span><span>Le code prévoit un e-mail au salon avec les informations du formulaire et, si elle est fournie, la photo. Un accusé est envoyé au client s’il indique une adresse e-mail.</span></li>
                                 <li><span aria-hidden="true">—</span><span>Aucune inscription marketing distincte n’a été identifiée dans le formulaire audité.</span></li>
                                 <li><span aria-hidden="true">—</span><span>Autres finalités effectivement poursuivies : <strong>[À COMPLÉTER]</strong></span></li>
                             </ul>
@@ -241,7 +242,9 @@
                             <ul class="card-list">
                                 <li><span aria-hidden="true">—</span><span><strong>Google Fonts</strong> et <strong>Google Fonts Static</strong> : chargement des polices Cormorant Garamond et Montserrat.</span></li>
                                 <li><span aria-hidden="true">—</span><span><strong>Google Maps</strong> : lien d’itinéraire externe chargé uniquement après un clic explicite.</span></li>
-                                <li><span aria-hidden="true">—</span><span><strong>Formulaire</strong> : aucun service d’envoi n’est connecté dans ce brouillon ; aucune donnée n’est transmise dans cet état.</span></li>
+                                <li><span aria-hidden="true">—</span><span><strong>Formulaire</strong> : envoi prévu par une fonction serveur via Gmail après configuration des identifiants ; les données et la photo facultative sont envoyées par e-mail.</span></li>
+                                <li><span aria-hidden="true">—</span><span><strong>Galerie</strong> : photos publiées sur un stockage Blob public ; masquer une photo dans la galerie ne rend pas son adresse privée.</span></li>
+                                <li><span aria-hidden="true">—</span><span><strong>Protection des formulaires</strong> : compteurs temporaires prévus dans un stockage Redis ; prestataire, emplacement et durée à vérifier avant activation.</span></li>
                                 <li><span aria-hidden="true">—</span><span><strong>Hébergement du site</strong> : <strong>[À COMPLÉTER]</strong></span></li>
                             </ul>
                         </div>
@@ -251,12 +254,12 @@
                         <div>
                             <h3>État du prototype</h3>
                             <p class="card-text">
-                                Le formulaire ne simule plus aucun succès. Tant qu’un point d’entrée sécurisé
-                                n’est pas configuré, il indique que l’envoi en ligne est indisponible et propose
-                                le numéro de téléphone du salon.
+                                Le formulaire signale une erreur si le service d’envoi ou sa protection ne sont
+                                pas configurés. Une demande n’est annoncée comme transmise qu’après réponse positive
+                                de la fonction d’envoi.
                             </p>
                             <ul class="card-list">
-                                <li><span aria-hidden="true">—</span><span>Aucun appel direct à <code>document.cookie</code>, <code>localStorage</code> ou outil d’analytics n’a été trouvé dans les trois fichiers audités.</span></li>
+                                <li><span aria-hidden="true">—</span><span>Une session administrateur utilise un cookie nécessaire et limité dans le temps. Aucun outil de mesure d’audience n’est prévu dans le code actuel.</span></li>
                                 <li><span aria-hidden="true">—</span><span>Les ressources et composants tiers peuvent néanmoins recevoir des données techniques, notamment lors de leur chargement.</span></li>
                                 <li><span aria-hidden="true">—</span><span>Contrats, rôles et politiques des prestataires retenus : <strong>[À COMPLÉTER avant activation]</strong></span></li>
                             </ul>
@@ -306,7 +309,7 @@
                             <ul class="card-list">
                                 <li><span aria-hidden="true">—</span><span>Canal et délai de confirmation réellement garantis : <strong>[À COMPLÉTER]</strong></span></li>
                                 <li><span aria-hidden="true">—</span><span>Réservation par téléphone : <a href="tel:+33478604621"><strong>04 78 60 46 21</strong></a></span></li>
-                                <li><span aria-hidden="true">—</span><span>Horaires affichés : mardi à vendredi, 9 h à 20 h ; samedi, 9 h à 19 h ; fermeture dimanche et lundi.</span></li>
+                                <li><span aria-hidden="true">—</span><span>Horaires affichés sur l’accueil : mardi à jeudi, 9 h à 18 h ; vendredi, 9 h à 20 h ; samedi, 9 h à 17 h ; fermeture dimanche et lundi. <strong>À confirmer auprès du salon.</strong></span></li>
                                 <li><span aria-hidden="true">—</span><span>Lien ou outil de réservation définitif : <strong>[À COMPLÉTER]</strong></span></li>
                             </ul>
                         </div>

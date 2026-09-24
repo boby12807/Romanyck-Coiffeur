@@ -40,7 +40,7 @@ const parisDate = () => {
 const validPreferredDate = (value) => {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || value < parisDate()) return false;
     const date = new Date(`${value}T12:00:00Z`);
-    if (Number.isNaN(date.getTime())) return false;
+    if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== value) return false;
     const maximum = new Date();
     maximum.setUTCFullYear(maximum.getUTCFullYear() + 1);
     if (date > maximum) return false;
@@ -59,7 +59,8 @@ export default async function handler(request, response) {
         return response.status(403).json({ error: 'Origine de la demande refusée.' });
     }
 
-    const rate = consumeRateLimit('booking', getClientIp(request), 5, 10 * 60 * 1000);
+    const rate = await consumeRateLimit('booking', getClientIp(request), 5, 10 * 60 * 1000);
+    if (rate.unavailable) return response.status(503).json({ error: 'Le formulaire est temporairement indisponible. Appelez le salon.' });
     if (!rate.allowed) {
         response.setHeader('Retry-After', String(rate.retryAfter));
         return response.status(429).json({ error: 'Trop de demandes rapprochées. Réessayez dans quelques minutes.' });
@@ -88,7 +89,7 @@ export default async function handler(request, response) {
     if (!data.name || phoneDigits.length < 10 || phoneDigits.length > 15 || !data.service || !validPreferredDate(data.preferredDate)) {
         return response.status(400).json({ error: 'Nom, téléphone, prestation ou date invalide.' });
     }
-    if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+    if (data.email && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(data.email)) {
         return response.status(400).json({ error: 'Adresse e-mail invalide.' });
     }
 

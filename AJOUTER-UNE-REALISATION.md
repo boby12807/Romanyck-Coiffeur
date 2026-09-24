@@ -11,7 +11,9 @@ Une fois le site publié sur Vercel, ouvrez :
 5. Cliquez sur **Publier la réalisation**.
 
 Depuis la même page, vous pouvez ensuite modifier le titre, masquer ou afficher une
-réalisation, changer son ordre et la supprimer avec ses photos.
+réalisation, changer son ordre et supprimer les nouvelles photos stockées sur Blob.
+Les photos fournies dans le dépôt restent accessibles directement et doivent aussi être
+retirées du dépôt si leur publication n'est plus autorisée.
 
 Les photos sont automatiquement redimensionnées et converties en WebP avant l’envoi. Elles
 sont ensuite enregistrées dans Vercel Blob et apparaissent dans la rubrique « Avant / Après »
@@ -22,6 +24,7 @@ du site public.
 - Utilisez deux photos prises avec le même cadrage et la même orientation.
 - Préférez un fond simple et une lumière similaire.
 - Vérifiez que la cliente ou le client a autorisé la publication.
+- Conservez la preuve de cette autorisation hors du dépôt public.
 - Ne publiez aucune information personnelle dans le titre ou la description.
 
 ## Protection

@@ -95,8 +95,9 @@ document.addEventListener('DOMContentLoaded', () => {
     logoutButton.addEventListener('click', async () => {
         try {
             await requestJson('/api/admin-session', { method: 'DELETE' });
-        } catch {
-            // La session est supprimée visuellement même si le réseau est interrompu.
+        } catch (error) {
+            setStatus(managerStatus, error.message || 'Déconnexion impossible. Réessayez.', 'error');
+            return;
         }
         setAuthenticated(false);
         setStatus(loginStatus, 'Vous êtes déconnecté.', 'success');
@@ -203,6 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     category: uploadForm.elements.category.value,
                     title: uploadForm.elements.title.value,
                     description: uploadForm.elements.description.value,
+                    publicationAuthorized: uploadForm.elements.publicationAuthorized.checked,
                     before: images.before,
                     after: images.after
                 })
@@ -249,12 +251,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!realisations[targetIndex]) return;
         const current = realisations[index];
         const target = realisations[targetIndex];
+        const neighbor = realisations[index + 2 * direction];
+        const targetOrder = Number(target.order);
+        const neighborOrder = neighbor ? Number(neighbor.order) : targetOrder + direction;
+        const newOrder = (targetOrder + neighborOrder) / 2;
+        if (!Number.isFinite(newOrder) || newOrder === targetOrder || newOrder === neighborOrder) {
+            setStatus(managerStatus, 'Impossible de déplacer cette photo. Actualisez la liste.', 'error');
+            return;
+        }
         try {
-            await requestJson('/api/realisations', {
-                method: 'PATCH',
-                body: JSON.stringify({ id: current.id, order: target.order })
-            });
-            await updateRealisation({ id: target.id, order: current.order }, 'Ordre mis à jour.');
+            await updateRealisation({ id: current.id, order: newOrder }, 'Ordre mis à jour.');
         } catch (error) {
             setStatus(managerStatus, error.message, 'error');
         }
@@ -272,6 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const createManagerCard = (item, index) => {
         const card = document.createElement('article');
         card.className = `admin-realisation-card${item.visible === false ? ' is-hidden' : ''}`;
+        const bundledPhotos = !String(item.before?.fallback || '').includes('.blob.vercel-storage.com/');
 
         const photos = document.createElement('div');
         photos.className = 'admin-realisation-photos';
@@ -306,15 +313,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     setStatus(managerStatus, error.message, 'error');
                 }
             }),
-            actionButton('Supprimer', 'admin-action-btn is-danger', async () => {
-                if (!window.confirm(`Supprimer définitivement « ${item.title} » et ses deux photos ?`)) return;
+            actionButton(bundledPhotos ? 'Retirer de la galerie' : 'Supprimer', 'admin-action-btn is-danger', async () => {
+                const question = bundledPhotos
+                    ? `Retirer « ${item.title} » de la galerie ? Ses photos restent dans les fichiers du site.`
+                    : `Supprimer « ${item.title} » et ses deux photos du stockage ?`;
+                if (!window.confirm(question)) return;
                 try {
                     setStatus(managerStatus, 'Suppression…');
                     await requestJson('/api/realisations', {
                         method: 'DELETE',
                         body: JSON.stringify({ id: item.id })
                     });
-                    setStatus(managerStatus, 'Réalisation supprimée.', 'success');
+                    setStatus(managerStatus, bundledPhotos ? 'Réalisation retirée de la galerie.' : 'Réalisation supprimée.', 'success');
                     await loadRealisations(false);
                 } catch (error) {
                     setStatus(managerStatus, error.message, 'error');

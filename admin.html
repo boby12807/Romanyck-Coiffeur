@@ -25,7 +25,7 @@
         <section class="admin-intro">
             <span class="section-subtitle">Espace privé</span>
             <h1>Gérer les avant / après</h1>
-            <p>Ajoutez vos nouveaux travaux, modifiez leur présentation, changez leur ordre ou masquez-les temporairement.</p>
+            <p>Ajoutez vos nouveaux travaux, modifiez leur présentation, changez leur ordre ou retirez-les de la galerie. Une photo masquée reste accessible à quiconque possède son adresse directe.</p>
         </section>
 
         <section class="admin-login-panel" id="adminLoginPanel">
@@ -98,6 +98,9 @@
                     </div>
 
                     <p class="admin-help">Utilisez deux photos prises au même endroit et dans la même orientation. Ne publiez que des images autorisées.</p>
+                    <div class="form-group admin-consent">
+                        <label><input name="publicationAuthorized" type="checkbox" required> Je confirme disposer de l’autorisation de publier ces deux photos.</label>
+                    </div>
                     <div class="form-status" id="uploadStatus" role="status" aria-live="polite" tabindex="-1"></div>
                     <button class="btn btn-primary btn-block" id="uploadButton" type="submit">Publier la réalisation</button>
                 </form>

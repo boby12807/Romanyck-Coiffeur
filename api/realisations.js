@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { del, list, put } from '@vercel/blob';
 import { hasAdminSession } from '../lib/admin-session.js';
+import { defaultRealisations } from '../lib/default-realisations.js';
 import {
     cleanText,
     consumeRateLimit,
@@ -23,29 +24,6 @@ const ALLOWED_CATEGORIES = new Set([
 const MAX_SINGLE_IMAGE_BYTES = 1_500_000;
 const MAX_COMBINED_IMAGE_BYTES = 3_000_000;
 const ENTRY_PREFIX = 'realisations/entries/';
-const DEFAULT_REALISATIONS = [{
-    id: 'default-balayage-01',
-    order: 1,
-    visible: true,
-    createdAt: '2026-08-06T00:00:00.000Z',
-    category: 'Balayage',
-    title: 'Transformation avant / après',
-    description: 'Une réalisation effectuée au salon, présentée en comparaison avant et après.',
-    before: {
-        webp: 'assets/balayage_before.webp',
-        fallback: 'assets/balayage_before.jpg',
-        alt: 'Chevelure avant la prestation, vue de dos',
-        width: 1024,
-        height: 1024
-    },
-    after: {
-        webp: 'assets/balayage_after.webp',
-        fallback: 'assets/balayage_after.jpg',
-        alt: 'Chevelure après la prestation, vue de dos',
-        width: 1024,
-        height: 1024
-    }
-}];
 
 const sortEntries = (entries) => entries.sort((a, b) => {
     const orderDifference = (a.order ?? 1000) - (b.order ?? 1000);
@@ -54,19 +32,38 @@ const sortEntries = (entries) => entries.sort((a, b) => {
 });
 
 const readStoredEntries = async () => {
-    const { blobs } = await list({ prefix: ENTRY_PREFIX, limit: 100 });
-    const entries = await Promise.all(blobs.map(async (blob) => {
-        try {
-            const result = await fetch(`${blob.url}?v=${blob.uploadedAt?.getTime?.() || Date.now()}`, {
-                cache: 'no-store'
-            });
-            if (!result.ok) return null;
-            return { metadataUrl: blob.url, data: await result.json() };
-        } catch {
-            return null;
+    // During local setup the bundled examples can be previewed without Blob.
+    // A production configuration error must not republish a masked example.
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+        if (process.env.NODE_ENV === 'production'
+            || (process.env.VERCEL && process.env.VERCEL_ENV !== 'development')) {
+            throw new Error('Stockage Blob non configuré.');
         }
+        return [];
+    }
+
+    const blobs = [];
+    let cursor;
+    let hasMore;
+    do {
+        const page = await list({ prefix: ENTRY_PREFIX, limit: 100, cursor });
+        blobs.push(...page.blobs);
+        hasMore = page.hasMore;
+        cursor = page.cursor;
+        if (hasMore && !cursor) throw new Error('Pagination du stockage incomplète.');
+    } while (hasMore);
+
+    return Promise.all(blobs.map(async (blob) => {
+        const result = await fetch(`${blob.url}?v=${blob.uploadedAt?.getTime?.() || Date.now()}`, {
+            cache: 'no-store'
+        });
+        if (!result.ok) throw new Error('Une réalisation enregistrée est inaccessible.');
+        const data = await result.json();
+        if (!data?.id) throw new Error('Une réalisation enregistrée est invalide.');
+        // Older gallery records used the label « Couleur ».
+        if (data.category === 'Couleur') data.category = 'Coloration';
+        return { metadataUrl: blob.url, data };
     }));
-    return entries.filter((entry) => entry?.data?.id);
 };
 
 const readMergedEntries = async () => {
@@ -74,7 +71,7 @@ const readMergedEntries = async () => {
     const storedIds = new Set(stored.map((entry) => entry.data.id));
     return [
         ...stored,
-        ...DEFAULT_REALISATIONS
+        ...defaultRealisations
             .filter((entry) => !storedIds.has(entry.id))
             .map((data) => ({ metadataUrl: null, data }))
     ];
@@ -94,7 +91,7 @@ const writeEntry = async (entry) => put(
 
 const validDimension = (value) => Number.isFinite(value) && value >= 200 && value <= 4000;
 
-const requireAdminMutation = (request, response) => {
+const requireAdminMutation = async (request, response) => {
     if (!isSameOrigin(request)) {
         response.status(403).json({ error: 'Origine de la demande refusée.' });
         return false;
@@ -103,7 +100,15 @@ const requireAdminMutation = (request, response) => {
         response.status(401).json({ error: 'Session administrateur expirée.' });
         return false;
     }
-    const rate = consumeRateLimit('admin-write', getClientIp(request), 40, 10 * 60 * 1000);
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+        response.status(503).json({ error: 'Le stockage des photos est à configurer.' });
+        return false;
+    }
+    const rate = await consumeRateLimit('admin-write', getClientIp(request), 40, 10 * 60 * 1000);
+    if (rate.unavailable) {
+        response.status(503).json({ error: 'La protection des modifications est indisponible.' });
+        return false;
+    }
     if (!rate.allowed) {
         response.setHeader('Retry-After', String(rate.retryAfter));
         response.status(429).json({ error: 'Trop de modifications rapprochées.' });
@@ -124,24 +129,23 @@ export default async function handler(request, response) {
             }
 
             const stored = await readMergedEntries();
-            const suppressedIds = stored
-                .map((entry) => entry.data)
-                .filter((entry) => entry.deleted || entry.visible === false)
-                .map((entry) => entry.id);
             const realisations = sortEntries(stored.map((entry) => entry.data))
                 .filter((entry) => !entry.deleted && (adminView || entry.visible !== false));
-            return response.status(200).json({ realisations, suppressedIds: adminView ? [] : suppressedIds });
+            return response.status(200).json({ realisations });
         }
 
         if (!['POST', 'PATCH', 'DELETE'].includes(request.method)) {
             response.setHeader('Allow', 'GET, POST, PATCH, DELETE');
             return response.status(405).json({ error: 'Méthode non autorisée.' });
         }
-        if (!requireAdminMutation(request, response)) return;
+        if (!await requireAdminMutation(request, response)) return;
 
         const body = readBody(request);
 
         if (request.method === 'POST') {
+            if (body.publicationAuthorized !== true) {
+                return response.status(400).json({ error: 'Confirmez l’autorisation de publication des deux photos.' });
+            }
             const title = cleanText(body.title, 90);
             const description = cleanText(body.description, 240);
             const category = cleanText(body.category, 40);
@@ -167,41 +171,51 @@ export default async function handler(request, response) {
                 Math.max(maximum, Number(entry.data.order) || 0)
             ), 0);
             const id = `${Date.now()}-${randomUUID()}`;
-            const beforeBlob = await put(
-                `realisations/media/${id}-avant.${before.extension}`,
-                before.buffer,
-                { access: 'public', contentType: before.contentType, addRandomSuffix: false }
-            );
-            const afterBlob = await put(
-                `realisations/media/${id}-apres.${after.extension}`,
-                after.buffer,
-                { access: 'public', contentType: after.contentType, addRandomSuffix: false }
-            );
+            const uploadedUrls = [];
+            try {
+                const beforeBlob = await put(
+                    `realisations/media/${id}-avant.${before.extension}`,
+                    before.buffer,
+                    { access: 'public', contentType: before.contentType, addRandomSuffix: false }
+                );
+                uploadedUrls.push(beforeBlob.url);
+                const afterBlob = await put(
+                    `realisations/media/${id}-apres.${after.extension}`,
+                    after.buffer,
+                    { access: 'public', contentType: after.contentType, addRandomSuffix: false }
+                );
+                uploadedUrls.push(afterBlob.url);
 
-            const realisation = {
-                id,
-                order: highestOrder + 1,
-                visible: true,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-                category,
-                title,
-                description: description || 'Une réalisation effectuée au salon, présentée en comparaison avant et après.',
-                before: {
-                    fallback: beforeBlob.url,
-                    alt: `Chevelure avant la prestation ${category.toLowerCase()}`,
-                    width: Math.round(beforeWidth),
-                    height: Math.round(beforeHeight)
-                },
-                after: {
-                    fallback: afterBlob.url,
-                    alt: `Chevelure après la prestation ${category.toLowerCase()}`,
-                    width: Math.round(afterWidth),
-                    height: Math.round(afterHeight)
+                const realisation = {
+                    id,
+                    order: highestOrder + 1,
+                    visible: true,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    category,
+                    title,
+                    description: description || 'Une réalisation effectuée au salon, présentée en comparaison avant et après.',
+                    before: {
+                        fallback: beforeBlob.url,
+                        alt: `Chevelure avant la prestation ${category.toLowerCase()}`,
+                        width: Math.round(beforeWidth),
+                        height: Math.round(beforeHeight)
+                    },
+                    after: {
+                        fallback: afterBlob.url,
+                        alt: `Chevelure après la prestation ${category.toLowerCase()}`,
+                        width: Math.round(afterWidth),
+                        height: Math.round(afterHeight)
+                    }
+                };
+                await writeEntry(realisation);
+                return response.status(201).json({ success: true, realisation });
+            } catch (error) {
+                if (uploadedUrls.length) {
+                    await del(uploadedUrls).catch((cleanupError) => console.error('Nettoyage photos échoué', cleanupError));
                 }
-            };
-            await writeEntry(realisation);
-            return response.status(201).json({ success: true, realisation });
+                throw error;
+            }
         }
 
         const id = cleanText(body.id, 120);
@@ -221,12 +235,13 @@ export default async function handler(request, response) {
                 });
                 return response.status(200).json({ success: true });
             }
-            const urls = [
-                current.metadataUrl,
+            await writeEntry({ ...current.data, visible: false, deleted: true, updatedAt: new Date().toISOString() });
+            const mediaUrls = [
                 current.data.before?.fallback,
                 current.data.after?.fallback
             ].filter((url) => typeof url === 'string' && url.includes('.blob.vercel-storage.com/'));
-            if (urls.length) await del(urls);
+            if (mediaUrls.length) await del(mediaUrls);
+            if (current.metadataUrl) await del(current.metadataUrl);
             return response.status(200).json({ success: true });
         }
 
@@ -238,7 +253,7 @@ export default async function handler(request, response) {
         const visible = body.visible === undefined ? current.data.visible !== false : body.visible === true;
         const order = body.order === undefined ? Number(current.data.order) : Number(body.order);
 
-        if (!title || !ALLOWED_CATEGORIES.has(category) || !Number.isInteger(order) || order < 1 || order > 1000) {
+        if (!title || !ALLOWED_CATEGORIES.has(category) || !Number.isFinite(order) || order < -1000000 || order > 1000000) {
             return response.status(400).json({ error: 'Modification invalide.' });
         }
 
