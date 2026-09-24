@@ -6,7 +6,7 @@
     <title>Romanyck Coiffure Lyon 3e | Coupe, couleur & balayage</title>
     <meta name="description" content="Salon de coiffure mixte à Lyon 3e : coupe, coiffage, couleur, balayage et soins. Découvrez le studio Romanyck et demandez votre rendez-vous.">
     <meta name="theme-color" content="#090c0e">
-    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="robots" content="noindex, nofollow">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta property="og:locale" content="fr_FR">
     <meta property="og:type" content="website">
@@ -275,42 +275,10 @@
 
                 <div class="work-filters" id="workFilters" aria-label="Filtrer les réalisations"></div>
 
-                <div class="realisations-grid is-single" id="realisationsGrid">
-                    <!-- Repli visible si JavaScript est désactivé. -->
-                    <article class="realisation-card" data-category="Balayage">
-                    <div class="before-after-slider" role="group" aria-label="Comparaison avant et après d'un balayage">
-                        <div class="image-container before-image">
-                            <picture>
-                                <source srcset="assets/balayage_before.webp" type="image/webp">
-                                <img src="assets/balayage_before.jpg" alt="Chevelure avant la prestation, vue de dos" width="1024" height="1024" loading="lazy" decoding="async">
-                            </picture>
-                            <span class="image-label label-before">Avant</span>
-                        </div>
-                        <div class="image-container after-image">
-                            <picture>
-                                <source srcset="assets/balayage_after.webp" type="image/webp">
-                                <img src="assets/balayage_after.jpg" alt="Chevelure après la prestation, vue de dos" width="1024" height="1024" loading="lazy" decoding="async">
-                            </picture>
-                            <span class="image-label label-after">Après</span>
-                        </div>
-                        <input class="slider-range" type="range" min="0" max="100" value="50" aria-label="Afficher davantage l'image avant ou après">
-                        <div class="slider-handle" aria-hidden="true">
-                            <div class="handle-line"></div>
-                            <div class="handle-button">
-                                <span class="symbol-icon" aria-hidden="true">↔</span>
-                            </div>
-                            <div class="handle-line"></div>
-                        </div>
-                    </div>
-                    <div class="realisation-meta">
-                        <div>
-                            <span class="realisation-category">Balayage</span>
-                            <h3>Transformation avant / après</h3>
-                        </div>
-                        <p>Une réalisation effectuée au salon, présentée en comparaison avant et après.</p>
-                    </div>
-                    </article>
+                <div class="realisations-grid" id="realisationsGrid" aria-live="polite">
+                    <p class="realisations-empty">Chargement des réalisations…</p>
                 </div>
+                <noscript><p class="realisations-empty">Activez JavaScript pour voir les comparaisons avant / après.</p></noscript>
 
                 <p class="realisations-note">
                     Seules les réalisations disposant d’une autorisation de publication doivent être ajoutées à cette galerie.
@@ -596,7 +564,6 @@
                 <div class="footer-practical-links">
                     <a href="tel:+33478604621">04 78 60 46 21</a>
                     <a href="https://www.google.com/maps/search/?api=1&query=Romanyck+Coiffure+Lyon+62+Avenue+Marechal+de+Saxe" target="_blank" rel="noopener noreferrer">Itinéraire</a>
-                    <a href="admin.html" rel="nofollow">Ajouter une réalisation</a>
                 </div>
             </div>
         </div>
@@ -625,7 +592,6 @@
     </a>
 
     <!-- Interactive Script -->
-    <script src="realisations-data.js?v=20260808-photos"></script>
     <script src="script.js"></script>
 </body>
 </html>

@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const mobileNavigation = window.matchMedia('(max-width: 1080px)');
 
-    // Galerie de travaux réels : données locales + ajouts enregistrés sur Vercel Blob
+    // L'API est la seule source d'affichage : une photo masquée ne réapparaît pas lors d'une panne.
     const realisationsGrid = document.getElementById('realisationsGrid');
     const workFilters = document.getElementById('workFilters');
     const normaliseRealisations = (items) => (
@@ -31,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             : []
     );
-    const localRealisations = normaliseRealisations(window.ROMANYCK_REALISATIONS);
 
     const createPicture = (image, label) => {
         const wrapper = document.createElement('div');
@@ -183,31 +182,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    renderRealisations(localRealisations);
-
     const loadPublishedRealisations = async () => {
         try {
             const response = await fetch('/api/realisations', {
                 headers: { Accept: 'application/json' },
                 cache: 'no-store'
             });
-            if (!response.ok) return;
+            if (!response.ok) throw new Error(`Galerie indisponible : ${response.status}`);
 
             const payload = await response.json();
-            const published = normaliseRealisations(payload.realisations);
-            const suppressedIds = new Set(Array.isArray(payload.suppressedIds) ? payload.suppressedIds : []);
-            const seen = new Set();
-            const merged = [...published, ...localRealisations]
-                .filter((item) => !item.id || !suppressedIds.has(item.id))
-                .filter((item) => {
-                    const key = item.id || item.before?.fallback;
-                    if (!key || seen.has(key)) return false;
-                    seen.add(key);
-                    return true;
-                });
-            renderRealisations(merged);
+            renderRealisations(payload.realisations);
         } catch {
-            // Le site local continue d'afficher les réalisations intégrées au projet.
+            if (!realisationsGrid) return;
+            const unavailable = document.createElement('p');
+            unavailable.className = 'realisations-empty';
+            unavailable.textContent = 'La galerie est momentanément indisponible. Réessayez plus tard.';
+            realisationsGrid.replaceChildren(unavailable);
         }
     };
 
@@ -602,7 +592,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setStatus('Envoi de votre demande…');
 
             const controller = new AbortController();
-            const timeoutId = window.setTimeout(() => controller.abort(), 20000);
+            let timeoutId;
 
             try {
                 const formData = new FormData(bookingForm);
@@ -616,6 +606,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     payload.project_photo = await prepareProjectPhoto(projectPhoto);
                     setStatus('Envoi de votre demande…');
                 }
+                timeoutId = window.setTimeout(() => controller.abort(), 20000);
                 const response = await fetch(endpointUrl, {
                     method: 'POST',
                     headers: {
