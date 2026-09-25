@@ -329,24 +329,26 @@ document.addEventListener('DOMContentLoaded', () => {
             nextMonth.disabled = formatCalendarDate(new Date(year, month + 1, 1)) > lastAllowed;
 
             const cells = [];
-            for (const weekday of ['L', 'M', 'M', 'J', 'V', 'S', 'D']) {
+            for (const weekday of ['Mar', 'Mer', 'Jeu', 'Ven', 'Sam']) {
                 const label = document.createElement('span');
                 label.textContent = weekday;
                 cells.push(label);
             }
-            const leading = (new Date(year, month, 1).getDay() + 6) % 7;
+            const firstWeekday = new Date(year, month, 1).getDay();
+            const leading = firstWeekday < 2 ? 0 : firstWeekday - 2;
             for (let i = 0; i < leading; i++) cells.push(document.createElement('span'));
 
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(year, month, day);
+                if (date.getDay() === 0 || date.getDay() === 1) continue;
                 const value = formatCalendarDate(date);
                 const button = document.createElement('button');
                 button.type = 'button';
                 button.textContent = String(day);
                 button.dataset.date = value;
                 button.setAttribute('aria-label', date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
-                button.disabled = value < firstAllowed || value > lastAllowed || date.getDay() === 0 || date.getDay() === 1;
+                button.disabled = value < firstAllowed || value > lastAllowed;
                 if (value === dateInput.value) {
                     button.classList.add('is-selected');
                     button.setAttribute('aria-current', 'date');
