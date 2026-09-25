@@ -194,10 +194,34 @@ document.addEventListener('DOMContentLoaded', () => {
             renderRealisations(payload.realisations);
         } catch {
             if (!realisationsGrid) return;
-            const unavailable = document.createElement('p');
-            unavailable.className = 'realisations-empty';
-            unavailable.textContent = 'La galerie est momentanément indisponible. Réessayez plus tard.';
-            realisationsGrid.replaceChildren(unavailable);
+            console.warn("API indisponible, chargement des réalisations par défaut pour l'aperçu local.");
+            const fallbackData = [
+                {
+                    id: 'coupe-blond-2026-01',
+                    category: 'Balayage',
+                    title: 'Coupe & blond fondu',
+                    description: 'Un blond plus lumineux et une coupe nette pour retrouver de la douceur et du mouvement.',
+                    before: { fallback: 'assets/realisations/coupe-blond-before.jpg', alt: 'Avant', width: 1091, height: 1400 },
+                    after: { fallback: 'assets/realisations/coupe-blond-after.jpg', alt: 'Après', width: 851, height: 1400 }
+                },
+                {
+                    id: 'blond-long-2026-02',
+                    category: 'Coloration',
+                    title: 'Blond beige lumineux',
+                    description: 'Un travail de lumière nuancé pour un blond beige naturel.',
+                    before: { fallback: 'assets/realisations/blond-long-before.jpg', alt: 'Avant', width: 648, height: 1400 },
+                    after: { fallback: 'assets/realisations/blond-long-after.jpg', alt: 'Après', width: 646, height: 1400 }
+                },
+                {
+                    id: 'balayage-boucles-2026-03',
+                    category: 'Balayage',
+                    title: 'Balayage & mouvement',
+                    description: 'Des reflets fondus et un coiffage wavy pour illuminer les longueurs.',
+                    before: { fallback: 'assets/realisations/balayage-boucles-before.jpg', alt: 'Avant', width: 648, height: 1400 },
+                    after: { fallback: 'assets/realisations/balayage-boucles-after.jpg', alt: 'Après', width: 703, height: 1400 }
+                }
+            ];
+            renderRealisations(fallbackData);
         }
     };
 
