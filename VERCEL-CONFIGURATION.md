@@ -24,6 +24,11 @@ Dans le tableau de bord Vercel :
 
 Vercel ajoute alors automatiquement la variable `BLOB_READ_WRITE_TOKEN`.
 
+Avant l'activation de l'administration, les quatre comparaisons avant / après
+fournies avec le site restent visibles même si Blob n'est pas connecté. Une fois
+les secrets d'administration renseignés, une panne ou l'absence de Blob bloque
+la galerie afin de ne pas réafficher une photo masquée par le propriétaire.
+
 ## 3. Ajouter les variables privées
 
 Créez également une base Upstash Redis pour les compteurs partagés entre toutes les fonctions.

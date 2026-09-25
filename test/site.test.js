@@ -21,16 +21,30 @@ test('la galerie locale contient toutes les réalisations et une catégorie admi
     assert.equal(result.body.realisations.find(({ id }) => id === 'blond-long-2026-02').category, 'Coloration');
 });
 
-test('une galerie sans stockage configuré échoue en production', async () => {
+test('la galerie initiale reste visible en production avant configuration du stockage', async () => {
     const previous = process.env.NODE_ENV;
     process.env.NODE_ENV = 'production';
     try {
         const result = response();
         await realisationsHandler({ method: 'GET', url: '/api/realisations', headers: { host: 'localhost' } }, result);
-        assert.equal(result.statusCode, 503);
+        assert.equal(result.statusCode, 200);
+        assert.equal(result.body.realisations.length, 4);
     } finally {
         if (previous === undefined) delete process.env.NODE_ENV;
         else process.env.NODE_ENV = previous;
+    }
+});
+
+test('une galerie administrée refuse de republier les exemples si Blob disparaît', async () => {
+    const previous = process.env.ADMIN_UPLOAD_PASSWORD;
+    process.env.ADMIN_UPLOAD_PASSWORD = 'configured-secret';
+    try {
+        const result = response();
+        await realisationsHandler({ method: 'GET', url: '/api/realisations', headers: { host: 'localhost' } }, result);
+        assert.equal(result.statusCode, 503);
+    } finally {
+        if (previous === undefined) delete process.env.ADMIN_UPLOAD_PASSWORD;
+        else process.env.ADMIN_UPLOAD_PASSWORD = previous;
     }
 });
 

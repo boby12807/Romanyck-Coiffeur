@@ -32,11 +32,11 @@ const sortEntries = (entries) => entries.sort((a, b) => {
 });
 
 const readStoredEntries = async () => {
-    // During local setup the bundled examples can be previewed without Blob.
-    // A production configuration error must not republish a masked example.
+    // Before the owner enables administration, the bundled examples are public
+    // even if Blob has not yet been connected. Once administration is configured,
+    // a missing Blob token must not republish an example previously hidden there.
     if (!process.env.BLOB_READ_WRITE_TOKEN) {
-        if (process.env.NODE_ENV === 'production'
-            || (process.env.VERCEL && process.env.VERCEL_ENV !== 'development')) {
+        if (process.env.ADMIN_UPLOAD_PASSWORD || process.env.ADMIN_SESSION_SECRET) {
             throw new Error('Stockage Blob non configuré.');
         }
         return [];
