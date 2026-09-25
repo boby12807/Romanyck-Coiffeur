@@ -851,19 +851,9 @@ section[id],
     height: 380px;
 }
 
-.item-wd {
-    grid-column: span 8;
-    height: 380px;
-}
-
 .item-product {
     grid-column: span 6;
     height: 520px;
-}
-
-.item-studio-full {
-    grid-column: span 12;
-    height: 420px;
 }
 
 /* Visionneuse des photos Produits */
@@ -2049,7 +2039,7 @@ section[id],
         gap: 20px;
     }
     
-    .item-lg, .item-md, .item-sm, .item-wd {
+    .item-lg, .item-md, .item-sm {
         grid-column: span 12;
         height: 400px;
     }
@@ -2234,8 +2224,7 @@ section[id],
 
     .item-lg,
     .item-md,
-    .item-sm,
-    .item-wd {
+    .item-sm {
         height: 300px;
     }
 
