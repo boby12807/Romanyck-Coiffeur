@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import realisationsHandler from '../api/realisations.js';
-import rendezVousHandler from '../api/rendez-vous.js';
 import adminSessionHandler from '../api/admin-session.js';
 import robotsHandler from '../api/robots.js';
 import sitemapHandler from '../api/sitemap.js';
@@ -81,20 +80,6 @@ test('une galerie administrée refuse de republier les exemples si Blob dispara�
         if (previous === undefined) delete process.env.ADMIN_UPLOAD_PASSWORD;
         else process.env.ADMIN_UPLOAD_PASSWORD = previous;
     }
-});
-
-test('la date impossible est refusée avant tout envoi de courriel', async () => {
-    const result = response();
-    await rendezVousHandler({
-        method: 'POST',
-        headers: { origin: 'http://localhost', host: 'localhost', 'x-forwarded-for': '127.0.0.1' },
-        body: {
-            form_started_at: Date.now() - 2000,
-            client_name: 'Camille', phone: '0612345678', service: 'femme-coupe',
-            preferred_date: '2027-02-30'
-        }
-    }, result);
-    assert.equal(result.statusCode, 400);
 });
 
 test('la connexion administrateur refuse une configuration de secrets incomplète', async () => {
@@ -184,10 +169,6 @@ test('une connexion administrateur valide crée un cookie sécurisé', async () 
 });
 
 test('les mutations refusent les requêtes provenant d’un autre site', async () => {
-    const appointment = response();
-    await rendezVousHandler({ method: 'POST', headers: { origin: 'https://evil.example', host: 'salon.example' }, body: {} }, appointment);
-    assert.equal(appointment.statusCode, 403);
-
     const login = response();
     await adminSessionHandler({ method: 'POST', headers: { origin: 'https://evil.example', host: 'salon.example' }, body: {} }, login);
     assert.equal(login.statusCode, 403);

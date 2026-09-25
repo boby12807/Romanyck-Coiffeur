@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Romanyck Coiffure Lyon 3e | Coupe, couleur & balayage</title>
-    <meta name="description" content="Salon de coiffure mixte à Lyon 3e : coupe, coiffage, couleur, balayage et soins. Découvrez le studio Romanyck et demandez votre rendez-vous.">
+    <meta name="description" content="Salon de coiffure mixte à Lyon 3e : coupe, coiffage, couleur, balayage et soins. Découvrez le studio Romanyck et contactez directement le salon.">
     <meta name="theme-color" content="#090c0e">
     <meta name="robots" content="index, follow, max-image-preview:large">
     <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -20,7 +20,7 @@
     <link rel="preload" href="assets/fonts/cormorant-garamond-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="assets/fonts/cormorant-garamond-italic-latin.woff2" as="font" type="font/woff2" crossorigin>
     <!-- Custom Style Sheet -->
-    <link rel="stylesheet" href="style.css?v=20260925-5">
+    <link rel="stylesheet" href="style.css?v=20260925-6">
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -82,7 +82,7 @@
             </nav>
 
             <div class="header-actions">
-                <a href="#reservation" class="btn btn-primary btn-sm">Prendre rendez-vous</a>
+                <a href="tel:+33478604621" class="btn btn-primary btn-sm">Appeler le salon</a>
                 <button class="mobile-toggle" id="mobileToggle" type="button" aria-label="Ouvrir le menu" aria-controls="navMenu" aria-expanded="false">
                     <span class="bar"></span>
                     <span class="bar"></span>
@@ -111,7 +111,7 @@
                         Coupe femme et homme, couleur, balayage et soins : le salon vous accompagne avec une approche personnalisée, attentive à votre style et à la nature de vos cheveux.
                     </p>
                     <div class="hero-actions">
-                        <a href="#reservation" class="btn btn-primary">Prendre rendez-vous <span class="symbol-icon" aria-hidden="true">→</span></a>
+                        <a href="tel:+33478604621" class="btn btn-primary">Appeler le salon <span class="symbol-icon" aria-hidden="true">→</span></a>
                         <a href="#realisations" class="btn btn-outline">Découvrir les réalisations</a>
                     </div>
                     <p class="hero-contact-line">
@@ -280,7 +280,7 @@
                 </p>
                 <div class="section-cta text-center">
                     <p>Vous avez un projet de transformation&nbsp;?</p>
-                    <a href="#reservation" class="btn btn-primary">Prendre rendez-vous</a>
+                    <a href="tel:+33478604621" class="btn btn-primary">Appeler le salon</a>
                 </div>
             </div>
         </section>
@@ -379,7 +379,7 @@
                     <div class="contact-info-panel">
                         <span class="section-subtitle">Informations pratiques</span>
                         <h2 class="section-title">Romanyck Coiffure à Lyon 3e</h2>
-                        <p class="contact-lead">Retrouvez le salon, appelez-nous ou envoyez une demande de rendez-vous.</p>
+                        <p class="contact-lead">Retrouvez le salon et contactez-nous directement par téléphone.</p>
                         
                         <div class="info-items">
                             <div class="info-item">
@@ -427,91 +427,6 @@
                         </div>
                     </div>
 
-                    <!-- Interactive Booking Form -->
-                    <div class="contact-form-panel" id="reservation">
-                        <div class="form-container">
-                            <h2>Demander un rendez-vous</h2>
-                            <p id="formIntro">Indiquez la prestation et la date souhaitées. Le salon vous recontacte pour confirmer le créneau.</p>
-                            <div class="contact-choice" aria-label="Contact direct">
-                                <span>Besoin d’une réponse immédiate&nbsp;?</span>
-                                <a href="tel:+33478604621">Appeler le 04 78 60 46 21</a>
-                            </div>
-
-                            <p class="form-delivery-note">Votre demande sera envoyée directement à Romanyck Coiffure.</p>
-
-                            <form id="bookingForm" method="post" novalidate data-endpoint="/api/rendez-vous" aria-describedby="formIntro formPrivacy">
-                                <input type="hidden" name="subject" value="Nouvelle demande de rendez-vous - Romanyck Coiffure">
-                                <input type="hidden" id="formStartedAt" name="form_started_at" value="">
-                                <div class="honeypot" aria-hidden="true">
-                                    <label for="website">Ne pas remplir ce champ</label>
-                                    <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="name">Votre prénom ou nom&nbsp;*</label>
-                                        <input type="text" id="name" name="client_name" required maxlength="80" autocomplete="name" placeholder="Ex. Camille">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="phone">Numéro de téléphone&nbsp;*</label>
-                                        <input type="tel" id="phone" name="phone" required minlength="10" maxlength="20" inputmode="tel" autocomplete="tel" placeholder="Ex. 06 12 34 56 78">
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="email">Adresse e-mail <span class="optional">(facultative, pour recevoir un accusé)</span></label>
-                                    <input type="email" id="email" name="email" maxlength="120" autocomplete="email" placeholder="Ex. camille@email.fr">
-                                </div>
-
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="service-cat">Type de prestation&nbsp;*</label>
-                                        <select id="service-cat" name="service" required>
-                                            <option value="">Sélectionnez une prestation...</option>
-                                            <option value="femme-coupe">Coupe & coiffage femme</option>
-                                            <option value="homme-coupe">Coupe homme</option>
-                                            <option value="coloration-balayage">Coloration / balayage</option>
-                                            <option value="soin">Soin</option>
-                                            <option value="diagnostic">Diagnostic / conseil</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="date-pref">Date souhaitée&nbsp;*</label>
-                                        <div class="date-field">
-                                            <input type="date" id="date-pref" name="preferred_date" required aria-describedby="dateHelp" aria-controls="dateCalendar" aria-expanded="false" aria-haspopup="dialog">
-                                            <button type="button" class="date-calendar-trigger" id="dateCalendarTrigger" aria-label="Ouvrir le calendrier" aria-controls="dateCalendar" aria-expanded="false">▦</button>
-                                            <div class="date-calendar" id="dateCalendar" role="dialog" aria-label="Choisir la date souhaitée" hidden>
-                                                <div class="date-calendar-header">
-                                                    <button type="button" id="calendarPrevious" aria-label="Mois précédent">‹</button>
-                                                    <strong id="calendarMonth" aria-live="polite"></strong>
-                                                    <button type="button" id="calendarNext" aria-label="Mois suivant">›</button>
-                                                </div>
-                                                <div class="date-calendar-grid" id="calendarDays"></div>
-                                            </div>
-                                        </div>
-                                        <span class="field-help" id="dateHelp">Touchez le champ pour ouvrir le calendrier. Date indicative du mardi au samedi, confirmée ensuite par le salon.</span>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="message">Votre projet <span class="optional">(facultatif)</span></label>
-                                    <textarea id="message" name="message" rows="3" maxlength="800" placeholder="Quelques mots sur votre coupe, votre couleur ou le résultat recherché."></textarea>
-                                </div>
-
-                                <div class="form-group project-photo-field">
-                                    <label for="projectPhoto">Photo d’inspiration <span class="optional">(facultative)</span></label>
-                                    <input type="file" id="projectPhoto" name="project_photo_file" accept="image/jpeg,image/png,image/webp" aria-describedby="projectPhotoHelp">
-                                    <span class="field-help" id="projectPhotoHelp">JPG, PNG ou WebP. La photo est automatiquement réduite avant l’envoi.</span>
-                                    <img class="project-photo-preview" id="projectPhotoPreview" alt="" hidden>
-                                </div>
-
-                                <p class="privacy-summary" id="formPrivacy">Les champs marqués * sont nécessaires pour répondre à votre demande. Aucune prospection commerciale n'est imposée. <a href="informations-legales.html#confidentialite">En savoir plus sur vos données</a>.</p>
-                                <div class="form-status" id="formStatus" role="status" aria-live="polite" tabindex="-1"></div>
-                                <button type="submit" class="btn btn-primary btn-block">Envoyer ma demande</button>
-                                <noscript><p class="form-status is-error">Le formulaire nécessite JavaScript. Appelez le <a href="tel:+33478604621">04 78 60 46 21</a>.</p></noscript>
-                            </form>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </section>
@@ -528,7 +443,7 @@
                         <span class="logo-sub">COIFFURE</span>
                     </a>
                     <p class="brand-quote">Coupe, couleur et coiffage à Lyon 3e.</p>
-                    <a href="#reservation" class="btn btn-primary btn-sm">Prendre rendez-vous</a>
+                    <a href="tel:+33478604621" class="btn btn-primary btn-sm">Appeler le salon</a>
                 </div>
 
                 <div class="footer-links">
@@ -550,7 +465,7 @@
                         <h2>Informations</h2>
                         <a href="informations-legales.html#mentions-legales">Mentions légales</a>
                         <a href="informations-legales.html#confidentialite">Confidentialité</a>
-                        <a href="informations-legales.html#conditions">Conditions de réservation</a>
+                        <a href="informations-legales.html#mediation">Réclamations et médiation</a>
                     </div>
                 </div>
             </div>
@@ -581,13 +496,7 @@
         <span class="symbol-icon" aria-hidden="true">↑</span>
     </a>
 
-    <!-- Bouton de réservation flottant de prestige (Glassmorphic CTA) -->
-    <a href="#reservation" class="floating-booking" id="floatingBooking" aria-label="Demander un rendez-vous">
-        <span class="floating-icon symbol-icon" aria-hidden="true">▦</span>
-        <span class="floating-text">Rendez-vous</span>
-    </a>
-
     <!-- Interactive Script -->
-    <script src="script.js?v=20260925-5"></script>
+    <script src="script.js?v=20260925-6"></script>
 </body>
 </html>
