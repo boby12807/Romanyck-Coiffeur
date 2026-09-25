@@ -302,18 +302,120 @@ document.addEventListener('DOMContentLoaded', () => {
     // Date souhaitée
     const dateInput = document.getElementById('date-pref');
     if (dateInput) {
-        dateInput.addEventListener('click', () => {
-            if (typeof dateInput.showPicker !== 'function') return;
-            try {
-                dateInput.showPicker();
-            } catch {
-                // Le sélecteur natif reste disponible sur les navigateurs qui le gèrent autrement.
-            }
-        });
-
         const now = new Date();
         const offset = now.getTimezoneOffset() * 60000;
         dateInput.min = new Date(now.getTime() - offset).toISOString().split('T')[0];
+
+        const calendar = document.getElementById('dateCalendar');
+        const calendarTrigger = document.getElementById('dateCalendarTrigger');
+        const calendarDays = document.getElementById('calendarDays');
+        const calendarMonth = document.getElementById('calendarMonth');
+        const previousMonth = document.getElementById('calendarPrevious');
+        const nextMonth = document.getElementById('calendarNext');
+        let shownMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+        const formatCalendarDate = (date) => (
+            `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+        );
+
+        const renderCalendar = () => {
+            if (!calendar || !calendarDays) return;
+            const year = shownMonth.getFullYear();
+            const month = shownMonth.getMonth();
+            calendarMonth.textContent = shownMonth.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+            const firstAllowed = dateInput.min || formatCalendarDate(now);
+            const lastAllowed = dateInput.max || '9999-12-31';
+            previousMonth.disabled = formatCalendarDate(new Date(year, month + 1, 0)) < firstAllowed;
+            nextMonth.disabled = formatCalendarDate(new Date(year, month + 1, 1)) > lastAllowed;
+
+            const cells = [];
+            for (const weekday of ['L', 'M', 'M', 'J', 'V', 'S', 'D']) {
+                const label = document.createElement('span');
+                label.textContent = weekday;
+                cells.push(label);
+            }
+            const leading = (new Date(year, month, 1).getDay() + 6) % 7;
+            for (let i = 0; i < leading; i++) cells.push(document.createElement('span'));
+
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                const value = formatCalendarDate(date);
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.textContent = String(day);
+                button.dataset.date = value;
+                button.setAttribute('aria-label', date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
+                button.disabled = value < firstAllowed || value > lastAllowed || date.getDay() === 0 || date.getDay() === 1;
+                if (value === dateInput.value) {
+                    button.classList.add('is-selected');
+                    button.setAttribute('aria-current', 'date');
+                }
+                cells.push(button);
+            }
+            calendarDays.replaceChildren(...cells);
+        };
+
+        const closeCalendar = (returnFocus = false) => {
+            if (!calendar || calendar.hidden) return;
+            calendar.hidden = true;
+            dateInput.setAttribute('aria-expanded', 'false');
+            calendarTrigger.setAttribute('aria-expanded', 'false');
+            if (returnFocus) dateInput.focus();
+        };
+
+        const openCalendar = () => {
+            if (!calendar || !calendar.hidden) return;
+            const selected = dateInput.value ? new Date(`${dateInput.value}T12:00:00`) : new Date();
+            shownMonth = new Date(selected.getFullYear(), selected.getMonth(), 1);
+            renderCalendar();
+            calendar.hidden = false;
+            dateInput.setAttribute('aria-expanded', 'true');
+            calendarTrigger.setAttribute('aria-expanded', 'true');
+            (calendarDays.querySelector('.is-selected:not(:disabled)') || calendarDays.querySelector('button:not(:disabled)'))?.focus();
+        };
+
+        dateInput.addEventListener('pointerdown', (event) => {
+            event.preventDefault();
+            openCalendar();
+        });
+        dateInput.addEventListener('click', openCalendar);
+        dateInput.addEventListener('keydown', (event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+            event.preventDefault();
+            openCalendar();
+        });
+        calendarTrigger?.addEventListener('click', () => {
+            if (calendar.hidden) openCalendar();
+            else closeCalendar(true);
+        });
+        previousMonth?.addEventListener('click', () => {
+            shownMonth = new Date(shownMonth.getFullYear(), shownMonth.getMonth() - 1, 1);
+            renderCalendar();
+            calendarDays.querySelector('button:not(:disabled)')?.focus();
+        });
+        nextMonth?.addEventListener('click', () => {
+            shownMonth = new Date(shownMonth.getFullYear(), shownMonth.getMonth() + 1, 1);
+            renderCalendar();
+            calendarDays.querySelector('button:not(:disabled)')?.focus();
+        });
+        calendarDays?.addEventListener('click', (event) => {
+            const day = event.target.closest('button[data-date]');
+            if (!day || day.disabled) return;
+            dateInput.value = day.dataset.date;
+            dateInput.dispatchEvent(new Event('input', { bubbles: true }));
+            dateInput.dispatchEvent(new Event('change', { bubbles: true }));
+            closeCalendar(true);
+        });
+        document.addEventListener('pointerdown', (event) => {
+            if (!calendar?.hidden && !event.target.closest('.date-field')) closeCalendar();
+        });
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && !calendar?.hidden) {
+                closeCalendar(true);
+                event.preventDefault();
+            }
+        });
 
         const validateOpeningDay = () => {
             if (!dateInput.value) {

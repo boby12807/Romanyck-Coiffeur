@@ -1253,14 +1253,106 @@ section[id],
     min-height: 50px;
 }
 
+.date-field {
+    position: relative;
+}
+
 #date-pref {
+    width: 100%;
+    padding-right: 48px;
     color-scheme: dark;
     cursor: pointer;
 }
 
 #date-pref::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.date-calendar-trigger {
+    position: absolute;
+    right: 4px;
+    top: 4px;
+    width: 44px;
+    height: 42px;
+    border: 0;
+    background: transparent;
+    color: var(--color-accent-gold);
+    font-size: 1.5rem;
     cursor: pointer;
-    filter: brightness(0) saturate(100%) invert(76%) sepia(16%) saturate(535%) hue-rotate(351deg) brightness(91%);
+}
+
+.date-calendar-trigger:focus-visible,
+.date-calendar button:focus-visible {
+    outline: 2px solid var(--color-accent-gold);
+    outline-offset: 2px;
+}
+
+.date-calendar {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 30;
+    width: min(328px, calc(100vw - 40px));
+    padding: 16px;
+    border: 1px solid var(--color-accent-gold);
+    border-radius: var(--border-radius-sm);
+    background: #171b1d;
+    color: var(--color-text-light);
+    box-shadow: 0 18px 38px rgba(0, 0, 0, 0.5);
+}
+
+.date-calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 12px;
+    text-transform: capitalize;
+}
+
+.date-calendar-header button,
+.date-calendar-grid button {
+    min-width: 36px;
+    min-height: 36px;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+}
+
+.date-calendar-header button {
+    font-size: 1.5rem;
+}
+
+.date-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 3px;
+    text-align: center;
+    align-items: center;
+}
+
+.date-calendar-grid span {
+    padding: 8px 0;
+    color: var(--color-text-light-muted);
+    font-size: 0.75rem;
+}
+
+.date-calendar-grid button:hover:not(:disabled),
+.date-calendar-grid button.is-selected {
+    background: var(--color-accent-gold);
+    color: #090c0e;
+}
+
+.date-calendar button:disabled {
+    color: #777;
+    cursor: not-allowed;
+}
+
+.date-calendar-header button:disabled {
+    opacity: 0.45;
 }
 
 .form-group textarea {
