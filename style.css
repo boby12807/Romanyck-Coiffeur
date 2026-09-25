@@ -964,8 +964,9 @@ section[id] {
 
 .contact-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    align-items: start;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
 }
 
 .contact-info-panel {
@@ -1071,10 +1072,17 @@ section[id] {
 }
 
 /* Luxury Map Embed & Interactive Card Badge */
-.luxury-map-container {
-    margin-top: 30px;
+.contact-image-panel {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    height: 100%;
+}
+
+.luxury-map-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     gap: 20px;
 }
 
@@ -1100,7 +1108,8 @@ section[id] {
 .maps-card-badge {
     position: relative;
     width: 100%;
-    height: 240px;
+    min-height: 400px;
+    height: 100%;
     border-radius: var(--border-radius-sm);
     overflow: hidden;
     border: 1px solid var(--color-border-light);
