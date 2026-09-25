@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#090c0e">
+    <title>Gérer les réalisations | Romanyck Coiffure</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="preload" href="assets/fonts/montserrat-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/fonts/cormorant-garamond-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="style.css?v=20260925-5">
+</head>
+<body class="admin-page">
+    <header class="admin-header">
+        <a href="index.html" class="logo" aria-label="Retourner au site Romanyck Coiffure">
+            <span class="logo-main">ROMANYCK</span>
+            <span class="logo-sub">COIFFURE</span>
+        </a>
+        <a href="index.html#realisations" class="btn btn-outline btn-sm">Voir les réalisations</a>
+    </header>
+
+    <main class="admin-main">
+        <section class="admin-intro">
+            <span class="section-subtitle">Espace privé</span>
+            <h1>Gérer les avant / après</h1>
+            <p>Ajoutez vos nouveaux travaux, modifiez leur présentation, changez leur ordre ou retirez-les de la galerie. Une photo masquée reste accessible à quiconque possède son adresse directe.</p>
+        </section>
+
+        <section class="admin-login-panel" id="adminLoginPanel">
+            <form class="admin-form admin-login-form" id="adminLoginForm" novalidate>
+                <div class="form-group">
+                    <label for="adminPassword">Mot de passe administrateur</label>
+                    <input id="adminPassword" name="password" type="password" required autocomplete="current-password">
+                </div>
+                <div class="form-status" id="loginStatus" role="status" aria-live="polite" tabindex="-1"></div>
+                <button class="btn btn-primary btn-block" id="loginButton" type="submit">Se connecter</button>
+            </form>
+        </section>
+
+        <div class="admin-workspace" id="adminWorkspace" hidden>
+            <div class="admin-toolbar">
+                <p>Session administrateur active</p>
+                <button class="btn btn-outline btn-sm" id="logoutButton" type="button">Se déconnecter</button>
+            </div>
+
+            <section class="admin-panel" aria-labelledby="addRealisationTitle">
+                <div class="admin-panel-heading">
+                    <span class="section-subtitle">Nouvelle publication</span>
+                    <h2 id="addRealisationTitle">Ajouter un avant / après</h2>
+                </div>
+
+                <form class="admin-form" id="realisationUploadForm" novalidate>
+                    <div class="admin-form-grid">
+                        <div class="form-group">
+                            <label for="realisationCategory">Catégorie&nbsp;*</label>
+                            <select id="realisationCategory" name="category" required>
+                                <option value="">Sélectionnez…</option>
+                                <option>Coupe</option>
+                                <option>Coloration</option>
+                                <option>Balayage</option>
+                                <option>Mèches</option>
+                                <option>Coiffure</option>
+                                <option>Transformation</option>
+                                <option>Soin</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="realisationTitle">Titre&nbsp;*</label>
+                            <input id="realisationTitle" name="title" type="text" required maxlength="90" placeholder="Ex. Balayage blond naturel">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="realisationDescription">Description <span class="optional">(facultative)</span></label>
+                        <textarea id="realisationDescription" name="description" rows="3" maxlength="240" placeholder="Quelques mots sur la transformation réalisée."></textarea>
+                    </div>
+
+                    <div class="admin-photo-grid">
+                        <label class="admin-photo-field" for="beforePhoto">
+                            <span class="admin-photo-heading">Photo avant&nbsp;*</span>
+                            <span class="admin-photo-preview">
+                                <img id="beforePreview" alt="" hidden>
+                                <span id="beforePlaceholder">Choisir la photo avant</span>
+                            </span>
+                            <input id="beforePhoto" name="beforePhoto" type="file" accept="image/jpeg,image/png,image/webp" required>
+                        </label>
+
+                        <label class="admin-photo-field" for="afterPhoto">
+                            <span class="admin-photo-heading">Photo après&nbsp;*</span>
+                            <span class="admin-photo-preview">
+                                <img id="afterPreview" alt="" hidden>
+                                <span id="afterPlaceholder">Choisir la photo après</span>
+                            </span>
+                            <input id="afterPhoto" name="afterPhoto" type="file" accept="image/jpeg,image/png,image/webp" required>
+                        </label>
+                    </div>
+
+                    <p class="admin-help">Utilisez deux photos prises au même endroit et dans la même orientation. Ne publiez que des images autorisées.</p>
+                    <div class="form-group admin-consent">
+                        <label><input name="publicationAuthorized" type="checkbox" required> Je confirme disposer de l’autorisation de publier ces deux photos.</label>
+                    </div>
+                    <div class="form-status" id="uploadStatus" role="status" aria-live="polite" tabindex="-1"></div>
+                    <button class="btn btn-primary btn-block" id="uploadButton" type="submit">Publier la réalisation</button>
+                </form>
+            </section>
+
+            <section class="admin-panel" aria-labelledby="manageRealisationTitle">
+                <div class="admin-panel-heading admin-panel-heading-row">
+                    <div>
+                        <span class="section-subtitle">Contenu publié</span>
+                        <h2 id="manageRealisationTitle">Vos réalisations</h2>
+                    </div>
+                    <button class="btn btn-outline btn-sm" id="refreshRealisations" type="button">Actualiser</button>
+                </div>
+                <div class="form-status" id="managerStatus" role="status" aria-live="polite" tabindex="-1"></div>
+                <div class="admin-realisations-list" id="adminRealisationsList"></div>
+            </section>
+        </div>
+    </main>
+
+    <dialog class="admin-edit-dialog" id="editRealisationDialog" aria-labelledby="editRealisationTitle">
+        <form class="admin-form admin-edit-form" id="editRealisationForm" method="dialog">
+            <button class="lightbox-close" id="editDialogClose" type="button" aria-label="Fermer">×</button>
+            <h2 id="editRealisationTitle">Modifier la réalisation</h2>
+            <input id="editRealisationId" name="id" type="hidden">
+            <div class="form-group">
+                <label for="editCategory">Catégorie</label>
+                <select id="editCategory" name="category" required>
+                    <option>Coupe</option><option>Coloration</option><option>Balayage</option>
+                    <option>Mèches</option><option>Coiffure</option><option>Transformation</option><option>Soin</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="editTitle">Titre</label>
+                <input id="editTitle" name="title" type="text" required maxlength="90">
+            </div>
+            <div class="form-group">
+                <label for="editDescription">Description</label>
+                <textarea id="editDescription" name="description" rows="4" maxlength="240"></textarea>
+            </div>
+            <div class="form-status" id="editStatus" role="status" aria-live="polite"></div>
+            <button class="btn btn-primary btn-block" type="submit">Enregistrer les modifications</button>
+        </form>
+    </dialog>
+
+    <script src="admin.js?v=20260925-5"></script>
+</body>
+</html>
