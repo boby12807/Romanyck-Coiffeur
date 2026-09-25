@@ -1253,6 +1253,16 @@ section[id],
     min-height: 50px;
 }
 
+#date-pref {
+    color-scheme: dark;
+    cursor: pointer;
+}
+
+#date-pref::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    filter: brightness(0) saturate(100%) invert(76%) sepia(16%) saturate(535%) hue-rotate(351deg) brightness(91%);
+}
+
 .form-group textarea {
     resize: vertical;
     min-height: 110px;

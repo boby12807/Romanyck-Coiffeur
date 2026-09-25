@@ -302,6 +302,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Date souhaitée
     const dateInput = document.getElementById('date-pref');
     if (dateInput) {
+        dateInput.addEventListener('click', () => {
+            if (typeof dateInput.showPicker !== 'function') return;
+            try {
+                dateInput.showPicker();
+            } catch {
+                // Le sélecteur natif reste disponible sur les navigateurs qui le gèrent autrement.
+            }
+        });
+
         const now = new Date();
         const offset = now.getTimezoneOffset() * 60000;
         dateInput.min = new Date(now.getTime() - offset).toISOString().split('T')[0];
