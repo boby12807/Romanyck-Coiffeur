@@ -16,7 +16,7 @@ Voir `.env.example`. Configurer uniquement les variables de l’environnement co
 
 - `ADMIN_UPLOAD_PASSWORD` : mot de passe unique d’au moins 16 caractères, idéalement généré par un gestionnaire de mots de passe.
 - `ADMIN_SESSION_SECRET` : valeur aléatoire d’au moins 32 caractères, distincte du mot de passe.
-- `BLOB_READ_WRITE_TOKEN` : jeton du nouveau stockage **privé**.
+- `BLOB_STORE_ID` : identifiant automatiquement ajouté par la connexion du stockage **privé**. Le SDK utilise l’identité temporaire OIDC de Vercel, sans clé permanente à gérer. Autre possibilité pour les opérations locales : `BLOB_READ_WRITE_TOKEN` du stockage privé. Ne pas enregistrer de copie durable d’un jeton OIDC temporaire.
 - `UPSTASH_REDIS_REST_URL` et `UPSTASH_REDIS_REST_TOKEN` : base Redis dédiée à cet environnement.
 - `PUBLIC_SITE_URL` : domaine HTTPS final, sans chemin, paramètres ou identifiants.
 - `MEDIATOR_NAME`, `MEDIATOR_ADDRESS`, `MEDIATOR_URL` : coordonnées exactes du médiateur conventionné par le salon, site en HTTPS.

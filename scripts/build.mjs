@@ -17,7 +17,12 @@ export const buildSite = async ({ env = process.env, output = resolve(root, 'dis
     if (production) {
         if ((env.ADMIN_UPLOAD_PASSWORD?.length || 0) < 16 || (env.ADMIN_SESSION_SECRET?.length || 0) < 32
             || env.ADMIN_UPLOAD_PASSWORD === env.ADMIN_SESSION_SECRET) throw new Error('Définissez un mot de passe de 16 caractères minimum et un secret aléatoire distinct de 32 caractères minimum.');
-        for (const name of ['BLOB_READ_WRITE_TOKEN', 'UPSTASH_REDIS_REST_URL', 'UPSTASH_REDIS_REST_TOKEN']) {
+        // Connected stores use Vercel's short-lived OIDC identity by default.
+        // The SDK resolves the runtime request token; a long-lived token is optional.
+        const blobConfigured = env.BLOB_READ_WRITE_TOKEN
+            || (env.BLOB_STORE_ID && (env.VERCEL_OIDC_TOKEN || env.VERCEL === '1'));
+        if (!blobConfigured) throw new Error('Connectez un stockage Blob privé (BLOB_STORE_ID sur Vercel), ou définissez BLOB_READ_WRITE_TOKEN.');
+        for (const name of ['UPSTASH_REDIS_REST_URL', 'UPSTASH_REDIS_REST_TOKEN']) {
             if (!env[name]) throw new Error(`${name} manque pour la production.`);
         }
     }

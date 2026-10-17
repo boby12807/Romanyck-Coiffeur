@@ -366,5 +366,9 @@ test('la construction production refuse les informations manquantes et échappe 
         const html = await readFile(resolve(output, 'informations-legales.html'), 'utf8');
         assert.match(html, /&lt;Mediator &amp; Co&gt;/); assert.doesNotMatch(html, /\{\{[A-Z_]+\}\}/);
         assert.match(html, /content="index, follow"/);
+        const oidcEnv = { ...env, BLOB_READ_WRITE_TOKEN: undefined, BLOB_STORE_ID: 'store_test', VERCEL: '1',
+            MEDIATOR_NAME: 'Médiateur de test', MEDIATOR_ADDRESS: 'Adresse test', MEDIATOR_URL: 'https://mediateur.fr' };
+        await buildSite({ output, env: oidcEnv });
+        await assert.rejects(buildSite({ output, env: { ...oidcEnv, VERCEL: undefined } }), /Blob privé/);
     } finally { await rm(output, { recursive: true, force: true }); }
 });
