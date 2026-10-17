@@ -9,12 +9,14 @@
     <meta name="robots" content="index, follow, max-image-preview:large">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta property="og:locale" content="fr_FR">
+    <meta property="og:url" content="{{PUBLIC_ORIGIN}}/">
+    <meta property="og:image" content="{{PUBLIC_ORIGIN}}/assets/facade_original.jpg">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Romanyck Coiffure">
     <meta property="og:title" content="Romanyck Coiffure à Lyon 3e">
     <meta property="og:description" content="Coupe, coiffage, couleur, balayage et soins dans un studio mixte à Lyon 3e.">
     <meta name="twitter:card" content="summary">
-    <link rel="canonical" href="/">
+    <link rel="canonical" href="{{PUBLIC_ORIGIN}}/">
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
     <link rel="preload" href="assets/fonts/montserrat-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="assets/fonts/cormorant-garamond-latin.woff2" as="font" type="font/woff2" crossorigin>
@@ -268,12 +270,8 @@
                     <p class="section-lead">Découvrez de vraies transformations réalisées au salon. Faites glisser le curseur de chaque réalisation pour comparer les deux images.</p>
                 </div>
 
-                <div class="work-filters" id="workFilters" aria-label="Filtrer les réalisations"></div>
-
-                <div class="realisations-grid" id="realisationsGrid" aria-live="polite">
-                    <p class="realisations-empty">Chargement des réalisations…</p>
-                </div>
-                <noscript><p class="realisations-empty">Activez JavaScript pour voir les comparaisons avant / après.</p></noscript>
+                <div class="work-filters{{GALLERY_FILTER_CLASS}}" id="workFilters" aria-label="Filtrer les réalisations">{{GALLERY_FILTERS}}</div>
+                <div class="realisations-grid{{GALLERY_SINGLE_CLASS}}" id="realisationsGrid">{{GALLERY}}</div>
 
                 <p class="realisations-note">
                     Seules les réalisations disposant d’une autorisation de publication doivent être ajoutées à cette galerie.
@@ -500,6 +498,6 @@
     </a>
 
     <!-- Interactive Script -->
-    <script src="script.js?v=20260925-7"></script>
+    <script src="script.js?v=20261017-static-1"></script>
 </body>
 </html>

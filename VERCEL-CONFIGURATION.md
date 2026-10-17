@@ -1,72 +1,32 @@
-# Configuration Vercel
+# Site vitrine standard sur Vercel
 
-Le site contient deux fonctions serveur :
+Le site est entièrement statique : aucune administration intégrée, API d’écriture, base Redis ou connexion Blob n’est utilisée. Les photos sont incluses dans la galerie lors de la construction, et restent visibles sans JavaScript ; celui-ci ajoute les comparaisons avant/après, les filtres et la navigation.
 
-- `/api/realisations` enregistre et affiche les nouvelles photos avant / après.
-- `/api/admin-session` gère l'accès à l'administration.
+## Déploiement
 
-Le site est en préparation. Ne l'ouvrir aux visiteurs qu'après validation des informations
-légales, des horaires et des autorisations de publication des photos.
+- Dépôt : `boby12807/Romanyck-Coiffeur` ; branche publique : `main`.
+- Adresse conservée : `https://romanyck-coiffeur-five.vercel.app`.
+- Node : 24 ; installation : `npm ci` ; construction : `npm run build` ; dossier public : `dist`.
+- L’adresse et les coordonnées du médiateur se règlent dans `site.config.js`. `PUBLIC_SITE_URL` peut aussi être défini dans Vercel pour remplacer l’adresse. Aucun secret n’est requis pour faire fonctionner le site.
+- Les prévisualisations sont marquées `noindex` et leur robots refuse l’indexation. Cela ne remplace pas la protection d’accès Vercel.
 
-## 1. Déployer le projet
+La construction publie uniquement les pages, styles, script, polices et images nécessaires. Les sources, documents internes, originaux de galerie, fichiers `.env` et ancienne administration sont exclus. Les photos choisies sont décodées et réencodées en WebP sans EXIF/GPS, et portent des noms dérivés de leur contenu. Aucun ancien fichier de construction n’est recopié.
 
-Importez ce dossier dans un nouveau projet Vercel. Le fichier `package.json` permet à Vercel
-d’installer automatiquement les dépendances nécessaires.
+## Contrôle des modifications
 
-## 2. Connecter Vercel Blob
+Les comptes GitHub et Vercel autorisés contrôlent l’ajout et le retrait des photos. Les visiteurs ne disposent d’aucune route d’écriture. Vérifier les collaborateurs du dépôt et les membres de l’équipe Vercel, activer la double authentification et garder des accès de récupération sûrs. Les protections de comptes ne sont pas remplacées par les en-têtes du site.
 
-Dans le tableau de bord Vercel :
+## Services inutilisés
 
-1. Ouvrez le projet.
-2. Allez dans **Storage**.
-3. Créez un stockage **Blob public** et connectez-le au projet.
+Ne connecter ni Redis ni Blob à cette version. Si un stockage Blob a déjà été créé pendant la préparation, il peut rester vide et inutilisé ; le déconnecter du projet retire les variables associées sans nécessiter la suppression du stockage. Aucune suppression irréversible de ressource ou de données n’est nécessaire au déploiement. Si une intégration Upstash a été acceptée mais qu’aucune base n’a été créée, ne pas poursuivre sa création.
 
-Vercel ajoute alors automatiquement la variable `BLOB_READ_WRITE_TOKEN`.
+## Vérifications
 
-Avant l'activation de l'administration, les quatre comparaisons avant / après
-fournies avec le site restent visibles même si Blob n'est pas connecté. Une fois
-les secrets d'administration renseignés, une panne ou l'absence de Blob bloque
-la galerie afin de ne pas réafficher une photo masquée par le propriétaire.
+1. `npm run verify`, `npm run build`, `npm audit --audit-level=high`.
+2. Ouvrir le site sur mobile et ordinateur ; contrôler les huit photos des quatre comparaisons, les filtres, les curseurs et le menu.
+3. Vérifier les en-têtes CSP/HSTS, les URL canoniques, `/robots.txt` et `/sitemap.xml`.
+4. Vérifier que `/admin.html`, `/admin.js`, `/api/admin-session`, `/api/realisations`, `/api/media`, `/.env` et `/lib/default-realisations.js` ne sont plus publiés.
+5. Vérifier que seuls les comptes autorisés peuvent modifier le dépôt et le projet.
+6. Faire confirmer les autorisations des images et les coordonnées du médiateur par le salon. En l’absence de coordonnées confirmées, la page légale le signale explicitement ; elle ne prétend pas que la conformité est complète et la construction affiche un avertissement. Ne pas inventer d’organisme.
 
-## 3. Ajouter les variables privées
-
-Créez également une base Upstash Redis pour les compteurs partagés entre toutes les fonctions.
-La connexion administrateur et les modifications renvoient une erreur 503
-en production si Redis n'est pas configuré : aucune action privée ne doit fonctionner sans cette protection.
-Les clés de limitation sont des empreintes SHA-256 des adresses IP et expirent avec leurs fenêtres.
-
-Dans **Project Settings → Environment Variables**, ajoutez :
-
-| Variable | Valeur |
-|---|---|
-| `ADMIN_UPLOAD_PASSWORD` | Un mot de passe long réservé au propriétaire du salon |
-| `ADMIN_SESSION_SECRET` | Une longue valeur aléatoire différente du mot de passe |
-| `UPSTASH_REDIS_REST_URL` | Adresse REST de la base Upstash Redis |
-| `UPSTASH_REDIS_REST_TOKEN` | Jeton REST de la base Upstash Redis |
-| `PUBLIC_SITE_URL` | URL HTTPS canonique du site, par exemple `https://www.votre-domaine.fr` |
-
-Appliquez les variables aux environnements **Production**, **Preview** et **Development**, puis
-redéployez le projet.
-
-## 4. Vérifications avant ouverture au public
-
-1. Vérifiez les informations publiques déjà intégrées dans `informations-legales.html` et
-   renseignez les coordonnées du médiateur de la consommation effectivement conventionné
-   par ROMANYCK. Vérifiez également les horaires avec le salon.
-2. Vérifiez la preuve d'autorisation pour chacune des photos initiales et futures.
-   Les fichiers fournis dans `assets/` restent accessibles par leur URL même après un
-   masquage dans la galerie : retirez-les aussi du dépôt si la publication est retirée.
-3. Définissez la procédure de suppression et de sauvegarde des photos Blob. La suppression d'un Blob public
-   peut prendre un court délai de propagation dans les caches.
-4. Activez la protection du déploiement de prévisualisation si nécessaire et contrôlez
-   les réponses HTTP sur le domaine choisi.
-5. Le référencement est activé. Vérifiez que `PUBLIC_SITE_URL` correspond au domaine définitif,
-   puis contrôlez `/robots.txt`, `/sitemap.xml` et l’URL canonique après le déploiement.
-
-## 5. Tester après déploiement, avant annonce du site
-
-1. Ouvrez `/admin.html`, connectez-vous, ajoutez une paire avant / après, puis testez la
-   modification, la visibilité, l’ordre et la suppression.
-2. Coupez temporairement l'accès au stockage de test : la galerie doit afficher un message
-   d'indisponibilité, sans réafficher une réalisation qui a été masquée.
-3. Lancez localement `npm run verify` avant chaque mise en production.
+Le retrait d’une image du nouveau déploiement n’efface pas les copies déjà téléchargées ou présentes dans l’historique GitHub et les anciens déploiements. Voir `AJOUTER-UNE-REALISATION.md`.
