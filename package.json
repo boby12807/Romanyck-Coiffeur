@@ -4,11 +4,6 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "gallery:seed": "node scripts/gallery.mjs seed",
-    "gallery:migrate": "node scripts/gallery.mjs migrate",
-    "gallery:backup": "node scripts/gallery.mjs backup",
-    "gallery:restore": "node scripts/gallery.mjs restore",
-    "gallery:cleanup": "node scripts/gallery.mjs cleanup",
     "check": "node scripts/check.mjs",
     "test": "node --test",
     "verify": "npm run check && npm test"
@@ -16,10 +11,7 @@
   "engines": {
     "node": "24.x"
   },
-  "dependencies": {
-    "@upstash/ratelimit": "^2.2.0",
-    "@upstash/redis": "^1.39.0",
-    "@vercel/blob": "^2.8.0",
+  "devDependencies": {
     "sharp": "^0.35.5"
   }
 }

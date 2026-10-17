@@ -1,7 +1,7 @@
 import { readdir } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
-const files = ['script.js', 'admin.js'];
-for (const folder of ['api', 'lib', 'scripts', 'test']) {
+const files = ['script.js', 'site.config.js'];
+for (const folder of ['lib', 'scripts', 'test']) {
     for (const name of await readdir(new URL(`../${folder}/`, import.meta.url))) {
         if (/\.(m?js)$/.test(name)) files.push(`${folder}/${name}`);
     }

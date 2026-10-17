@@ -155,7 +155,7 @@
                     <h2 class="section-title" id="titre-confidentialite">Politique de confidentialité</h2>
                     <p class="section-lead">
                         Le site public ne contient aucun formulaire de contact.
-                        Les données techniques sont limitées à la sécurité et à l’administration de la galerie.
+                        Les données techniques sont limitées au fonctionnement et à la sécurité de l’hébergement.
                     </p>
                 </div>
 
@@ -179,13 +179,13 @@
                         <div>
                             <h3>Cadre du traitement</h3>
                             <p class="card-text">
-                                ROMANYCK est responsable des traitements liés à son activité. L’administration
-                                privée du site permet uniquement de gérer les réalisations publiées dans la galerie.
+                                ROMANYCK est responsable des traitements liés à son activité. Les photos de la galerie
+                                sont publiées par le responsable du site à partir des fichiers du projet.
                             </p>
                             <ul class="card-list">
                                 <li><span aria-hidden="true">—</span><span>Responsable du traitement : <strong>ROMANYCK</strong>, joignable à <a href="mailto:romanyckj@gmail.com"><strong>romanyckj@gmail.com</strong></a>.</span></li>
                                 <li><span aria-hidden="true">—</span><span>Base légale de la sécurité et de la prévention des abus : intérêt légitime de ROMANYCK à protéger son service.</span></li>
-                                <li><span aria-hidden="true">—</span><span>Destinataires techniques : Vercel pour l’hébergement et Upstash pour la limitation des abus liés à l’administration.</span></li>
+                                <li><span aria-hidden="true">—</span><span>Destinataires techniques : Vercel pour l’hébergement des pages et des fichiers publics du site.</span></li>
                                 <li><span aria-hidden="true">—</span><span>Certains prestataires peuvent traiter des données hors de l’Espace économique européen selon leurs garanties contractuelles et mécanismes de transfert applicables.</span></li>
                             </ul>
                         </div>
@@ -199,7 +199,7 @@
                                 sécurité du service et aux obligations légales applicables.
                             </p>
                             <ul class="card-list">
-                                <li><span aria-hidden="true">—</span><span>Sécurité : accès restreints, chiffrement des échanges, secrets hors du code, limitation des requêtes et sessions administrateur signées.</span></li>
+                                <li><span aria-hidden="true">—</span><span>Sécurité : accès aux outils de publication réservés aux personnes autorisées, chiffrement HTTPS et protections du navigateur.</span></li>
                                 <li><span aria-hidden="true">—</span><span>Droits d’accès, rectification, effacement, limitation et opposition : demande à <a href="mailto:romanyckj@gmail.com"><strong>romanyckj@gmail.com</strong></a>.</span></li>
                                 <li><span aria-hidden="true">—</span><span>Aucun délégué à la protection des données n’est désigné. Les demandes sont traitées directement par ROMANYCK.</span></li>
                                 <li><span aria-hidden="true">—</span><span>Une réclamation peut être adressée à l’autorité de contrôle compétente ; en France : <a href="https://www.cnil.fr/" target="_blank" rel="noopener noreferrer"><strong>CNIL</strong></a>.</span></li>
@@ -217,10 +217,10 @@
                 </div>
                 <div class="contact-form-panel"><div class="form-container">
                     <p>Le salon utilise les photographies avant et après pour présenter son travail. Lorsqu’une personne est identifiable, leur publication repose sur son autorisation préalable et sur son consentement pour ce traitement. Le refus ou le retrait de cette autorisation n’affecte pas les prestations du salon.</p>
-                    <p>Les photographies publiées sont visibles par les visiteurs du site et peuvent être copiées par eux. Les images masquées sont réservées à l’administration. Les fichiers sont hébergés par Vercel ; les informations de publication sont conservées dans Upstash Redis.</p>
-                    <p>Les photos sont conservées tant qu’elles servent cette présentation et que leur autorisation reste valable. Le salon réexamine cette nécessité chaque année. Vous pouvez demander leur retrait à <a href="mailto:romanyckj@gmail.com">romanyckj@gmail.com</a>. Le retrait bloque leur accès depuis le site ; il ne permet pas de rappeler les copies déjà téléchargées par des tiers.</p>
-                    <p>Les justificatifs d’autorisation sont conservés séparément, avec un accès limité, pendant la publication et la durée nécessaire à la défense des droits du salon. Les sauvegardes suivent une rotation de 30 jours ; une restauration doit respecter les retraits intervenus depuis leur création.</p>
-                    <p>Les sessions d’administration expirent au bout de 8 heures et sont révoquées à la déconnexion. Les compteurs de limitation expirent après leur fenêtre de contrôle, de 1 à 15 minutes. Les journaux de sécurité ne doivent pas dépasser 30 jours de conservation hors nécessité liée à un incident.</p>
+                    <p>Les photographies publiées sont visibles par les visiteurs du site et peuvent être copiées par eux. Les fichiers publics sont hébergés par Vercel. Le site ne comporte ni compte visiteur ni espace d’administration.</p>
+                    <p>Les photos sont conservées tant qu’elles servent cette présentation et que leur autorisation reste valable. Vous pouvez demander leur retrait à <a href="mailto:romanyckj@gmail.com">romanyckj@gmail.com</a>. Le retrait nécessite une mise à jour du site et la prise en compte de ses éventuelles anciennes versions. Il ne permet pas de rappeler les copies déjà téléchargées par des tiers.</p>
+                    <p>Les justificatifs d’autorisation sont conservés séparément, avec un accès limité, pendant la publication et la durée nécessaire à la défense des droits du salon. Les archives du projet et toute restauration doivent respecter les demandes de retrait intervenues depuis leur création.</p>
+
                 </div></div>
             </div>
         </section>
@@ -241,8 +241,8 @@
                         <div>
                             <h3>Services utilisés</h3>
                             <ul class="card-list">
-                                <li><span aria-hidden="true">—</span><span><strong>Vercel</strong> : hébergement du site, fonctions serveur et stockage privé des photos de la galerie, servies uniquement lorsqu’elles sont publiées ou après connexion de l’administrateur.</span></li>
-                                <li><span aria-hidden="true">—</span><span><strong>Upstash Redis</strong> : compteurs temporaires destinés à protéger l’administration ; les adresses IP sont transformées en empreintes avant stockage.</span></li>
+                                <li><span aria-hidden="true">—</span><span><strong>Vercel</strong> : hébergement des pages et des photos publiques du site vitrine.</span></li>
+
                                 <li><span aria-hidden="true">—</span><span><strong>Google Maps</strong> : simple lien d’itinéraire externe, ouvert uniquement après un clic explicite.</span></li>
                                 <li><span aria-hidden="true">—</span><span><strong>Polices</strong> : Cormorant Garamond et Montserrat sont servies directement par le site, sans appel à Google Fonts.</span></li>
                             </ul>
@@ -253,13 +253,13 @@
                         <div>
                             <h3>Fonctionnement et sécurité</h3>
                             <p class="card-text">
-                                L’administration de la galerie est protégée par une session signée et une limitation
-                                des tentatives. Aucun formulaire public ne transmet de données depuis le site.
+                                Les modifications du site passent par les accès protégés du responsable de publication.
+                                Aucun formulaire public ne transmet de données depuis le site.
                             </p>
                             <ul class="card-list">
-                                <li><span aria-hidden="true">—</span><span>Une session administrateur utilise un cookie nécessaire et limité dans le temps. Aucun outil de mesure d’audience n’est prévu dans le code actuel.</span></li>
+                                <li><span aria-hidden="true">—</span><span>Le site ne crée aucun compte et aucun cookie de connexion. Aucun outil de mesure d’audience n’est prévu dans le code actuel.</span></li>
                                 <li><span aria-hidden="true">—</span><span>Les prestataires techniques peuvent recevoir les données strictement nécessaires au service, conformément à leurs engagements contractuels.</span></li>
-                                <li><span aria-hidden="true">—</span><span>Les photos de la galerie sont publiques. Les masquer ne rend pas leur ancienne adresse confidentielle ; une suppression du stockage est nécessaire.</span></li>
+                                <li><span aria-hidden="true">—</span><span>Les photos publiées sont des fichiers publics. Un retrait demande leur suppression de la version publiée et le contrôle des anciennes versions accessibles.</span></li>
                             </ul>
                         </div>
                     </article>
@@ -272,8 +272,8 @@
                                 Un bandeau de consentement n’est donc pas nécessaire pour la version actuelle.
                             </p>
                             <ul class="card-list">
-                                <li><span aria-hidden="true">—</span><span><strong>romanyck_admin</strong> : cookie strictement nécessaire, créé uniquement après connexion à l’administration, durée maximale de 8 heures.</span></li>
-                                <li><span aria-hidden="true">—</span><span>Ce cookie est protégé par les attributs HttpOnly, Secure et SameSite=Strict.</span></li>
+                                <li><span aria-hidden="true">—</span><span>Cookie de connexion ou d’administration : <strong>aucun</strong>.</span></li>
+                                <li><span aria-hidden="true">—</span><span>Les modifications sont effectuées depuis les comptes de publication du responsable du site.</span></li>
                                 <li><span aria-hidden="true">—</span><span>Cookies fonctionnels, statistiques et marketing : <strong>aucun dans la version actuelle</strong>.</span></li>
                             </ul>
                         </div>
@@ -303,7 +303,7 @@
                             </p>
                             <ul class="card-list">
                                 <li><span aria-hidden="true">—</span><span>Réclamation : <a href="mailto:romanyckj@gmail.com"><strong>romanyckj@gmail.com</strong></a> ou courrier au siège social.</span></li>
-                                <li><span aria-hidden="true">—</span><span><strong>Médiateur de la consommation :</strong> {{MEDIATOR_NAME}} — {{MEDIATOR_ADDRESS}}. <a href="{{MEDIATOR_URL}}" target="_blank" rel="noopener noreferrer">Consulter le site du médiateur</a>.</span></li>
+                                <li><span aria-hidden="true">—</span><span><strong>Médiateur de la consommation :</strong> {{MEDIATOR_DETAILS}}</span></li>
                                 <li><span aria-hidden="true">—</span><span>Le droit français s’applique, sous réserve des protections impératives accordées au consommateur.</span></li>
                                 <li><span aria-hidden="true">—</span><span>Version en vigueur : <strong>17 octobre 2026</strong>.</span></li>
                             </ul>
@@ -350,6 +350,6 @@
     </footer>
 
     <a href="#contenu" class="back-to-top" id="backToTop" aria-label="Retourner en haut de la page">↑</a>
-    <script src="script.js?v=20261017-security-1"></script>
+    <script src="script.js?v=20261017-static-1"></script>
 </body>
 </html>

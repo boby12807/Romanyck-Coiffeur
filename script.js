@@ -8,203 +8,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const mobileNavigation = window.matchMedia('(max-width: 1080px)');
 
-    // L'API est la seule source d'affichage : une photo masquée ne réapparaît pas lors d'une panne.
-    const realisationsGrid = document.getElementById('realisationsGrid');
-    const workFilters = document.getElementById('workFilters');
-    const normaliseRealisations = (items) => (
-        Array.isArray(items)
-            ? items
-            .filter((item) => (
-                item
-                && item.visible !== false
-                && item.category
-                && item.title
-                && item.before?.fallback
-                && item.before?.alt
-                && item.after?.fallback
-                && item.after?.alt
-            ))
-            .sort((a, b) => {
-                const orderDifference = (a.order ?? 100) - (b.order ?? 100);
-                if (orderDifference) return orderDifference;
-                return Date.parse(b.createdAt || 0) - Date.parse(a.createdAt || 0);
-            })
-            : []
-    );
-
-    const createPicture = (image, label) => {
-        const wrapper = document.createElement('div');
-        wrapper.className = `image-container ${label === 'Avant' ? 'before-image' : 'after-image'}`;
-
-        const picture = document.createElement('picture');
-        if (image.webp) {
-            const source = document.createElement('source');
-            source.srcset = image.webp;
-            source.type = 'image/webp';
-            picture.append(source);
-        }
-
-        const img = document.createElement('img');
-        img.src = image.fallback;
-        img.alt = image.alt;
-        img.width = image.width ?? 1200;
-        img.height = image.height ?? 1200;
-        img.loading = 'lazy';
-        img.decoding = 'async';
-        picture.append(img);
-
-        const imageLabel = document.createElement('span');
-        imageLabel.className = `image-label ${label === 'Avant' ? 'label-before' : 'label-after'}`;
-        imageLabel.textContent = label;
-
-        wrapper.append(picture, imageLabel);
-        return wrapper;
-    };
-
-    const createRealisationCard = (item) => {
-        const card = document.createElement('article');
-        card.className = 'realisation-card';
-        card.dataset.category = item.category;
-
-        const comparison = document.createElement('div');
-        comparison.className = 'before-after-slider';
-        comparison.setAttribute('role', 'group');
-        comparison.setAttribute('aria-label', `Comparaison avant et après : ${item.title}`);
-
-        const range = document.createElement('input');
-        range.className = 'slider-range';
-        range.type = 'range';
-        range.min = '0';
-        range.max = '100';
-        range.value = '50';
-        range.setAttribute('aria-label', "Afficher davantage l'image avant ou après");
-
-        const updateComparison = () => {
-            const value = Number(range.value);
+    // Galerie intégrée au HTML : aucune connexion à un service de stockage.
+    document.querySelectorAll('.before-after-slider').forEach((comparison) => {
+        const range = comparison.querySelector('.slider-range');
+        if (!range) return;
+        const update = () => {
+            const value = Math.min(100, Math.max(0, Number(range.value)));
             comparison.style.setProperty('--clip-pos', `${value}%`);
-            range.setAttribute('aria-valuetext', `${value} % de l'image avant visible`);
+            range.setAttribute('aria-valuetext', `${value} % de l’image avant visible`);
         };
-        range.addEventListener('input', updateComparison);
-
-        const handle = document.createElement('div');
-        handle.className = 'slider-handle';
-        handle.setAttribute('aria-hidden', 'true');
-
-        const lineBefore = document.createElement('div');
-        lineBefore.className = 'handle-line';
-        const handleButton = document.createElement('div');
-        handleButton.className = 'handle-button';
-        const arrow = document.createElement('span');
-        arrow.className = 'symbol-icon';
-        arrow.setAttribute('aria-hidden', 'true');
-        arrow.textContent = '↔';
-        handleButton.append(arrow);
-        const lineAfter = document.createElement('div');
-        lineAfter.className = 'handle-line';
-        handle.append(lineBefore, handleButton, lineAfter);
-
-        comparison.append(
-            createPicture(item.before, 'Avant'),
-            createPicture(item.after, 'Après'),
-            range,
-            handle
-        );
-        updateComparison();
-
-        const meta = document.createElement('div');
-        meta.className = 'realisation-meta';
-        const headingGroup = document.createElement('div');
-        const category = document.createElement('span');
-        category.className = 'realisation-category';
-        category.textContent = item.category;
-        const title = document.createElement('h3');
-        title.textContent = item.title;
-        headingGroup.append(category, title);
-        const description = document.createElement('p');
-        description.textContent = item.description || '';
-        meta.append(headingGroup, description);
-
-        card.append(comparison, meta);
-        return card;
-    };
-
-    const renderRealisations = (items) => {
-        const realisations = normaliseRealisations(items);
-        if (!realisationsGrid) return;
-
-        workFilters?.classList.remove('is-visible');
-        workFilters?.replaceChildren();
-        if (!realisations.length) {
-            const empty = document.createElement('p');
-            empty.className = 'realisations-empty';
-            empty.textContent = 'Les nouvelles réalisations du salon seront bientôt publiées ici.';
-            realisationsGrid.replaceChildren(empty);
-            realisationsGrid.classList.remove('is-single');
-            return;
-        }
-
-        realisationsGrid.replaceChildren(...realisations.map(createRealisationCard));
-        realisationsGrid.classList.toggle('is-single', realisations.length === 1);
-
-        const categories = [...new Set(realisations.map((item) => item.category))];
-
-        if (workFilters && categories.length > 1) {
-            const createFilterButton = (label, value, active = false) => {
-                const button = document.createElement('button');
-                button.className = `work-filter-btn${active ? ' active' : ''}`;
-                button.type = 'button';
-                button.dataset.filter = value;
-                button.setAttribute('aria-pressed', String(active));
-                button.textContent = label;
-                return button;
-            };
-
-            workFilters.replaceChildren(
-                createFilterButton('Toutes', 'all', true),
-                ...categories.map((category) => createFilterButton(category, category))
-            );
-            workFilters.classList.add('is-visible');
-
-            workFilters.querySelectorAll('.work-filter-btn').forEach((button) => {
-                button.addEventListener('click', () => {
-                    workFilters.querySelectorAll('.work-filter-btn').forEach((candidate) => {
-                        const isActive = candidate === button;
-                        candidate.classList.toggle('active', isActive);
-                        candidate.setAttribute('aria-pressed', String(isActive));
-                    });
-
-                    realisationsGrid.querySelectorAll('.realisation-card').forEach((card) => {
-                        card.hidden = button.dataset.filter !== 'all'
-                            && card.dataset.category !== button.dataset.filter;
-                    });
-                });
+        range.addEventListener('input', update);
+        update();
+    });
+    const workFilters = document.getElementById('workFilters');
+    const realisationsGrid = document.getElementById('realisationsGrid');
+    workFilters?.querySelectorAll('.work-filter-btn').forEach((button) => {
+        button.addEventListener('click', () => {
+            workFilters.querySelectorAll('.work-filter-btn').forEach((candidate) => {
+                const active = candidate === button;
+                candidate.classList.toggle('active', active);
+                candidate.setAttribute('aria-pressed', String(active));
             });
-        }
-    };
-
-    const loadPublishedRealisations = async () => {
-        try {
-            const response = await fetch('/api/realisations', {
-                headers: { Accept: 'application/json' },
-                cache: 'no-store'
+            realisationsGrid?.querySelectorAll('.realisation-card').forEach((card) => {
+                card.hidden = button.dataset.filter !== 'all' && card.dataset.category !== button.dataset.filter;
             });
-            if (!response.ok) throw new Error(`Galerie indisponible : ${response.status}`);
-
-            const payload = await response.json();
-            renderRealisations(payload.realisations);
-        } catch {
-            if (!realisationsGrid) return;
-            workFilters?.replaceChildren();
-            workFilters?.classList.remove('is-visible');
-            const message = document.createElement('p');
-            message.className = 'realisations-empty';
-            message.textContent = 'La galerie est temporairement indisponible. Réessayez dans quelques instants.';
-            realisationsGrid.replaceChildren(message);
-            realisationsGrid.classList.remove('is-single');
-        }
-    };
-
-    loadPublishedRealisations();
+        });
+    });
 
     // Navigation mobile
     const mobileToggle = document.getElementById('mobileToggle');
