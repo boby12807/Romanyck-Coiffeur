@@ -1,34 +1,20 @@
-# Ajouter une réalisation depuis votre ordinateur
+# Gérer les réalisations
 
-Une fois le site publié sur Vercel, ouvrez :
+Ouvrir `https://votre-domaine.fr/admin.html` et saisir le mot de passe réservé au salon.
 
-`https://votre-domaine.fr/admin.html`
+Pour publier : choisir la catégorie et le titre, ajouter les deux photos avant/après, confirmer leur autorisation de publication, puis cliquer sur **Publier la réalisation**. Conserver les justificatifs séparément, hors du dépôt et du site.
 
-1. Saisissez votre mot de passe administrateur.
-2. Choisissez la catégorie et le titre de la réalisation.
-3. Sélectionnez la photo **avant** depuis votre ordinateur.
-4. Sélectionnez la photo **après**.
-5. Cliquez sur **Publier la réalisation**.
+Les images sont préparées par le navigateur puis décodées et réencodées sur le serveur. Leurs dimensions réelles sont contrôlées et leurs métadonnées retirées. Utiliser des photos JPEG, PNG ou WebP prises dans des conditions comparables. Les données envoyées au serveur doivent peser au maximum 1,5 Mo par photo.
 
-Depuis la même page, vous pouvez ensuite modifier le titre, masquer ou afficher une
-réalisation, changer son ordre et supprimer les nouvelles photos stockées sur Blob.
-Les photos fournies dans le dépôt restent accessibles directement et doivent aussi être
-retirées du dépôt si leur publication n'est plus autorisée.
+Les fichiers sont conservés dans un stockage privé. Le site ne sert aux visiteurs que les photos des réalisations visibles.
 
-Les photos sont automatiquement redimensionnées et converties en WebP avant l’envoi. Elles
-sont ensuite enregistrées dans Vercel Blob et apparaissent dans la rubrique « Avant / Après »
-du site public.
+- **Masquer** : retire la réalisation de la galerie et bloque ses liens directs pour les visiteurs. Elle reste consultable dans l’administration.
+- **Afficher** : demande de confirmer que l’autorisation de publication est toujours valable.
+- **Supprimer** : retire immédiatement la publication et efface ses médias privés. Les photos initiales ne sont plus accessibles depuis le site, même si leur fichier reste dans le paquet serveur.
+- **Réessayer la suppression** : termine une suppression de fichiers qui a échoué. La réalisation reste inaccessible au public pendant cette reprise.
 
-## Conseils pour les photos
+Le retrait du site ne rappelle pas les copies déjà téléchargées. Pour les anciennes photos publiées sur GitHub ou via un ancien déploiement, faire aussi traiter ces copies par le responsable du site.
 
-- Utilisez deux photos prises avec le même cadrage et la même orientation.
-- Préférez un fond simple et une lumière similaire.
-- Vérifiez que la cliente ou le client a autorisé la publication.
-- Conservez la preuve de cette autorisation hors du dépôt public.
-- Ne publiez aucune information personnelle dans le titre ou la description.
+Se déconnecter à la fin de l’utilisation. La déconnexion révoque la session sur le serveur ; une panne de ce service est signalée au lieu d’afficher un faux succès. Les sessions expirent après huit heures. Changer le mot de passe ou le secret de signature invalide les sessions précédentes une fois la nouvelle configuration appliquée aux déploiements.
 
-## Protection
-
-La page d’administration demande le mot de passe défini dans la variable Vercel
-`ADMIN_UPLOAD_PASSWORD`. La session est signée par `ADMIN_SESSION_SECRET`. Ne partagez pas
-ces valeurs et ne les inscrivez jamais dans un fichier du site.
+En cas de demande de retrait, commencer par masquer la réalisation, puis procéder à sa suppression. Vérifier les éventuelles copies publiques historiques et tenir compte de la demande lors des restaurations de sauvegardes.

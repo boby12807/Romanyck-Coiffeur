@@ -278,11 +278,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const createManagerCard = (item, index) => {
         const card = document.createElement('article');
         card.className = `admin-realisation-card${item.visible === false ? ' is-hidden' : ''}`;
-        const bundledPhotos = !String(item.before?.fallback || '').includes('.blob.vercel-storage.com/');
+        const deletionPending = item.deletionPending === true;
 
         const photos = document.createElement('div');
         photos.className = 'admin-realisation-photos';
-        [item.before, item.after].forEach((photo) => {
+        (deletionPending ? [] : [item.before, item.after]).forEach((photo) => {
             const image = document.createElement('img');
             image.src = photo.fallback;
             image.alt = photo.alt;
@@ -294,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
         content.className = 'admin-realisation-content';
         const eyebrow = document.createElement('span');
         eyebrow.className = 'realisation-category';
-        eyebrow.textContent = `${item.category} · ${item.visible === false ? 'Masquée' : 'Visible'}`;
+        eyebrow.textContent = `${item.category} · ${deletionPending ? 'Suppression à terminer' : item.visible === false ? 'Masquée' : 'Visible'}`;
         const title = document.createElement('h3');
         title.textContent = item.title;
         const description = document.createElement('p');
@@ -303,20 +303,20 @@ document.addEventListener('DOMContentLoaded', () => {
         actions.className = 'admin-realisation-actions';
 
         actions.append(
-            actionButton('Monter', 'admin-action-btn', () => moveRealisation(index, -1), index === 0),
-            actionButton('Descendre', 'admin-action-btn', () => moveRealisation(index, 1), index === realisations.length - 1),
-            actionButton('Modifier', 'admin-action-btn', () => openEditDialog(item)),
+            actionButton('Monter', 'admin-action-btn', () => moveRealisation(index, -1), index === 0 || deletionPending),
+            actionButton('Descendre', 'admin-action-btn', () => moveRealisation(index, 1), index === realisations.length - 1 || deletionPending),
+            actionButton('Modifier', 'admin-action-btn', () => openEditDialog(item), deletionPending),
             actionButton(item.visible === false ? 'Afficher' : 'Masquer', 'admin-action-btn', async () => {
                 try {
-                    await updateRealisation({ id: item.id, visible: item.visible === false }, 'Visibilité mise à jour.');
+                    if (item.visible === false && !window.confirm('Confirmez-vous que l’autorisation de publier ces deux photos est toujours valable ?')) return;
+                    await updateRealisation({ id: item.id, visible: item.visible === false,
+                        publicationAuthorized: item.visible === false }, 'Visibilité mise à jour.');
                 } catch (error) {
                     setStatus(managerStatus, error.message, 'error');
                 }
-            }),
-            actionButton(bundledPhotos ? 'Retirer de la galerie' : 'Supprimer', 'admin-action-btn is-danger', async () => {
-                const question = bundledPhotos
-                    ? `Retirer « ${item.title} » de la galerie ? Ses photos restent dans les fichiers du site.`
-                    : `Supprimer « ${item.title} » et ses deux photos du stockage ?`;
+            }, deletionPending),
+            actionButton(deletionPending ? 'Réessayer la suppression' : 'Supprimer', 'admin-action-btn is-danger', async () => {
+                const question = `Supprimer « ${item.title} » et retirer l’accès à ses deux photos ?`;
                 if (!window.confirm(question)) return;
                 try {
                     setStatus(managerStatus, 'Suppression…');
@@ -324,9 +324,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         method: 'DELETE',
                         body: JSON.stringify({ id: item.id })
                     });
-                    setStatus(managerStatus, bundledPhotos ? 'Réalisation retirée de la galerie.' : 'Réalisation supprimée.', 'success');
+                    setStatus(managerStatus, 'Réalisation supprimée.', 'success');
                     await loadRealisations(false);
                 } catch (error) {
+                    await loadRealisations(false);
                     setStatus(managerStatus, error.message, 'error');
                 }
             })

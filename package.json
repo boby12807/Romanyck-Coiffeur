@@ -3,7 +3,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "node --check script.js && node --check admin.js && node --check api/admin-session.js && node --check api/realisations.js && node --check api/robots.js && node --check api/sitemap.js && node --check lib/admin-session.js && node --check lib/default-realisations.js && node --check lib/security.js && node --check lib/site-url.js",
+    "build": "node scripts/build.mjs",
+    "gallery:seed": "node scripts/gallery.mjs seed",
+    "gallery:migrate": "node scripts/gallery.mjs migrate",
+    "gallery:backup": "node scripts/gallery.mjs backup",
+    "gallery:restore": "node scripts/gallery.mjs restore",
+    "gallery:cleanup": "node scripts/gallery.mjs cleanup",
+    "check": "node scripts/check.mjs",
     "test": "node --test",
     "verify": "npm run check && npm test"
   },
@@ -13,6 +19,7 @@
   "dependencies": {
     "@upstash/ratelimit": "^2.2.0",
     "@upstash/redis": "^1.39.0",
-    "@vercel/blob": "^2.8.0"
+    "@vercel/blob": "^2.8.0",
+    "sharp": "^0.35.5"
   }
 }

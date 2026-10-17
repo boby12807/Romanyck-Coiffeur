@@ -13,6 +13,9 @@ export default function handler(request, response) {
 
     response.setHeader('Content-Type', 'text/plain; charset=utf-8');
     response.setHeader('Cache-Control', 'public, max-age=0, s-maxage=3600');
+    if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== 'production') {
+        return response.status(200).send('User-agent: *\nDisallow: /\n');
+    }
     return response.status(200).send(`User-agent: *
 Allow: /
 Disallow: /admin.html

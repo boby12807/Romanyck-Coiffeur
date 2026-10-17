@@ -8,7 +8,7 @@
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>Informations légales | Romanyck Coiffure</title>
     <meta name="description" content="Mentions légales, politique de confidentialité et services techniques du site Romanyck Coiffure à Lyon.">
-    <link rel="canonical" href="/informations-legales.html">
+    <link rel="canonical" href="{{PUBLIC_ORIGIN}}/informations-legales.html">
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
     <link rel="preload" href="assets/fonts/montserrat-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="assets/fonts/cormorant-garamond-latin.woff2" as="font" type="font/woff2" crossorigin>
@@ -59,7 +59,7 @@
                         <p>
                             Les informations d’immatriculation ci-dessous ont été recoupées avec les données
                             publiques du Registre national des entreprises. Dernière mise à jour de cette page :
-                            <strong>25 septembre 2026</strong>.
+                            <strong>17 octobre 2026</strong>.
                         </p>
                         <a class="btn btn-outline" href="https://annuaire-entreprises.data.gouv.fr/entreprise/romanyck-483378121" target="_blank" rel="noopener noreferrer">Consulter la fiche publique</a>
                     </div>
@@ -210,6 +210,21 @@
             </div>
         </section>
 
+        <section class="contact-section" id="photos" aria-labelledby="titre-photos">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title" id="titre-photos">Photographies des réalisations</h2>
+                </div>
+                <div class="contact-form-panel"><div class="form-container">
+                    <p>Le salon utilise les photographies avant et après pour présenter son travail. Lorsqu’une personne est identifiable, leur publication repose sur son autorisation préalable et sur son consentement pour ce traitement. Le refus ou le retrait de cette autorisation n’affecte pas les prestations du salon.</p>
+                    <p>Les photographies publiées sont visibles par les visiteurs du site et peuvent être copiées par eux. Les images masquées sont réservées à l’administration. Les fichiers sont hébergés par Vercel ; les informations de publication sont conservées dans Upstash Redis.</p>
+                    <p>Les photos sont conservées tant qu’elles servent cette présentation et que leur autorisation reste valable. Le salon réexamine cette nécessité chaque année. Vous pouvez demander leur retrait à <a href="mailto:romanyckj@gmail.com">romanyckj@gmail.com</a>. Le retrait bloque leur accès depuis le site ; il ne permet pas de rappeler les copies déjà téléchargées par des tiers.</p>
+                    <p>Les justificatifs d’autorisation sont conservés séparément, avec un accès limité, pendant la publication et la durée nécessaire à la défense des droits du salon. Les sauvegardes suivent une rotation de 30 jours ; une restauration doit respecter les retraits intervenus depuis leur création.</p>
+                    <p>Les sessions d’administration expirent au bout de 8 heures et sont révoquées à la déconnexion. Les compteurs de limitation expirent après leur fenêtre de contrôle, de 1 à 15 minutes. Les journaux de sécurité ne doivent pas dépasser 30 jours de conservation hors nécessité liée à un incident.</p>
+                </div></div>
+            </div>
+        </section>
+
         <section class="expertise-section" id="services-tiers" aria-labelledby="titre-tiers">
             <div class="container">
                 <div class="section-header">
@@ -226,7 +241,7 @@
                         <div>
                             <h3>Services utilisés</h3>
                             <ul class="card-list">
-                                <li><span aria-hidden="true">—</span><span><strong>Vercel</strong> : hébergement du site, fonctions serveur et stockage public des photos de la galerie.</span></li>
+                                <li><span aria-hidden="true">—</span><span><strong>Vercel</strong> : hébergement du site, fonctions serveur et stockage privé des photos de la galerie, servies uniquement lorsqu’elles sont publiées ou après connexion de l’administrateur.</span></li>
                                 <li><span aria-hidden="true">—</span><span><strong>Upstash Redis</strong> : compteurs temporaires destinés à protéger l’administration ; les adresses IP sont transformées en empreintes avant stockage.</span></li>
                                 <li><span aria-hidden="true">—</span><span><strong>Google Maps</strong> : simple lien d’itinéraire externe, ouvert uniquement après un clic explicite.</span></li>
                                 <li><span aria-hidden="true">—</span><span><strong>Polices</strong> : Cormorant Garamond et Montserrat sont servies directement par le site, sans appel à Google Fonts.</span></li>
@@ -288,9 +303,9 @@
                             </p>
                             <ul class="card-list">
                                 <li><span aria-hidden="true">—</span><span>Réclamation : <a href="mailto:romanyckj@gmail.com"><strong>romanyckj@gmail.com</strong></a> ou courrier au siège social.</span></li>
-                                <li><span aria-hidden="true">—</span><span><strong>Médiateur de la consommation :</strong> ses coordonnées doivent être ajoutées dès confirmation de l’organisme conventionné par ROMANYCK.</span></li>
+                                <li><span aria-hidden="true">—</span><span><strong>Médiateur de la consommation :</strong> {{MEDIATOR_NAME}} — {{MEDIATOR_ADDRESS}}. <a href="{{MEDIATOR_URL}}" target="_blank" rel="noopener noreferrer">Consulter le site du médiateur</a>.</span></li>
                                 <li><span aria-hidden="true">—</span><span>Le droit français s’applique, sous réserve des protections impératives accordées au consommateur.</span></li>
-                                <li><span aria-hidden="true">—</span><span>Version en vigueur : <strong>25 septembre 2026</strong>.</span></li>
+                                <li><span aria-hidden="true">—</span><span>Version en vigueur : <strong>17 octobre 2026</strong>.</span></li>
                             </ul>
                         </div>
                     </article>
@@ -298,22 +313,6 @@
             </div>
         </section>
 
-        <section class="expertise-section" id="champs-manquants" aria-labelledby="titre-manquants">
-            <div class="container">
-                <div class="section-header text-center">
-                    <span class="section-subtitle">Point de vigilance</span>
-                    <h2 class="section-title" id="titre-manquants">Médiation à confirmer</h2>
-                    <p class="section-lead">
-                        Le salon doit confirmer l’organisme de médiation de la consommation auquel il a adhéré,
-                        puis ajouter ici son nom, son adresse et son site. Cette donnée dépend d’un contrat externe
-                        et ne peut pas être déduite des registres publics.
-                    </p>
-                </div>
-                <div class="section-cta text-center">
-                    <a href="index.html#contact" class="btn btn-primary">Retour au salon</a>
-                </div>
-            </div>
-        </section>
     </main>
 
     <footer class="footer">
@@ -351,6 +350,6 @@
     </footer>
 
     <a href="#contenu" class="back-to-top" id="backToTop" aria-label="Retourner en haut de la page">↑</a>
-    <script src="script.js?v=20260925-6"></script>
+    <script src="script.js?v=20261017-security-1"></script>
 </body>
 </html>
